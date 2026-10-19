@@ -1,0 +1,127 @@
+@import "@fontsource/anton";
+@import "@fontsource/rock-salt";
+@import "@fontsource-variable/dm-sans";
+@import "tailwindcss";
+
+/*
+ * Design tokens. Source: Pandito brand manual 2026 (Paleta Pista, Tipografía).
+ *
+ * FROM THE MANUAL: colors, font families and roles, DM Sans 16 px web minimum.
+ * TEAM DECISIONS (not in the manual): --radius-ui, the sticker shadows and --ease-spring.
+ * PROPOSAL, pending approval: the web type scale (--text-*). The manual only defines
+ * sizes for 1080 px pieces (Anton 48+, Rock Salt 56+), not for the web.
+ *
+ * Color roles: naranja = logo and protagonist (never changes); azul = strong accent;
+ * tinta = text and dark background; crema = light background; amarillo = small details only.
+ * Approved small-text pairs: tinta/crema, crema/tinta, crema/azul, amarillo/tinta, azul/crema.
+ */
+@theme {
+  --color-naranja: #d4571f;
+  --color-azul: #2340e8;
+  --color-tinta: #14141a;
+  --color-crema: #f5eee2;
+  --color-amarillo: #ffd23f;
+
+  --font-display: "Anton", Impact, sans-serif; /* titles, up to 6 words */
+  --font-script: "Rock Salt", cursive; /* comments and signatures, up to 6 words */
+  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif; /* text, data, prices */
+
+  --text-hero: clamp(2.75rem, 8vw, 6.5rem); /* Home hero headline only */
+  --text-hero--line-height: 1;
+  --text-display: clamp(3rem, 9vw, 7rem);
+  --text-display--line-height: 1.05;
+  --text-title: clamp(2.25rem, 6vw, 4rem);
+  --text-title--line-height: 1.12; /* room for accents on capitals (Á, É) between lines */
+  --text-subtitle: clamp(1.5rem, 3vw, 2rem);
+  --text-subtitle--line-height: 1;
+  --text-script-title: clamp(2.75rem, 7.5vw, 6.5rem); /* Rock Salt used as a section title */
+  --text-script-title--line-height: 1.15;
+  --text-closing: clamp(1.5rem, 8vw, 6rem); /* long single word ("personalizados?") must fit 320 px */
+  --text-closing--line-height: 1.08;
+  --text-headline: clamp(1.9rem, 4.2vw, 4rem); /* DM Sans headlines (wider letters than Anton) */
+  --text-headline--line-height: 1.12;
+  --text-script: clamp(1.5rem, 3vw, 2.25rem);
+  --text-script--line-height: 1.3;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-label: 0.875rem; /* compact Anton labels (nav, buttons) */
+  --text-label--line-height: 1;
+
+  --radius-ui: 0.375rem;
+
+  --shadow-sticker: 1.5px 1.5px 0 var(--color-naranja);
+  --shadow-sticker-ink: 1.5px 1.5px 0 var(--color-tinta);
+  --shadow-sticker-lift: 2.5px 2.5px 0 var(--color-tinta);
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Die-cut sticker outline: a cream border that follows the shape of the image. No shadow behind
+ * it (team decision, not in the manual).
+ */
+@utility die-cut {
+  filter: drop-shadow(3px 0 0 var(--color-crema)) drop-shadow(-3px 0 0 var(--color-crema))
+    drop-shadow(0 3px 0 var(--color-crema)) drop-shadow(0 -3px 0 var(--color-crema));
+}
+
+/*
+ * Fine film grain (team decision, hero only): tiny dark specks from SVG noise, multiplied over the
+ * content. Static, no motion. Tuned to stay subtle; raise or lower the opacity on the element.
+ */
+@utility grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0 0.1 3.2 0 0 0 -1.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+  mix-blend-mode: multiply;
+}
+
+@layer base {
+  /* Full-bleed decorations (the tape divider) must never cause horizontal scrolling. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-crema);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  /*
+   * Cursor (team decision): an orange dot everywhere, including over text and links, instead of
+   * the system arrow, text bar and hand. The cream ring keeps it visible over orange (Pando) and
+   * dark areas. Interactive elements already show their own hover state.
+   */
+  html,
+  body,
+  body * {
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='7' fill='%23d4571f' stroke='%23f5eee2' stroke-width='2'/%3E%3C/svg%3E")
+        10 10,
+      auto;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-azul);
+    outline-offset: 3px;
+  }
+
+  .surface-dark :focus-visible {
+    outline-color: var(--color-amarillo);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

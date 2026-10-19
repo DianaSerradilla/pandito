@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pandito</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Orange cover shown from the very first paint, so there is no cream flash before the
+         preloader starts. The Preloader component removes it as soon as React mounts. #d4571f is
+         the manual's naranja. -->
+    <div id="preloader-seed" style="position: fixed; inset: 0; z-index: 100; background: #d4571f"></div>
+    <noscript><style>#preloader-seed { display: none; }</style></noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
