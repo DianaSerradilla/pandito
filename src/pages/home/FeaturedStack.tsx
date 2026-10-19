@@ -3,60 +3,92 @@ import { featuredItems } from './featuredItems'
 import { FeaturedCard } from './FeaturedCard'
 import { ScrollSticker } from './ScrollSticker'
 
-// Pinned card stack (reference: "Recent werk" on extrafazant.nl). The section is tall and its
-// content is sticky: while you scroll through it, the front card slides down and the next one
-// behind it moves up to take its place. Cards behind only show a thin strip above the front one.
-const PEEK = 22 // px each card behind rises above the one in front
-const SHRINK = 0.045 // horizontal shrink per step behind
-const SCROLL_PER_CARD = 0.85 // screens of scroll for each hand-over
-const END = 0.9 // fraction of the scroll range where the last hand-over finishes
+// Featured stickers stuck on a laptop (a photo) while you scroll (team request, replaces the
+// card stack). The section is pinned; each sticker, one after the other, comes in from the viewer's side
+// (bigger, tilted, with a long soft shadow), slams onto the wall, gets a small press and stays
+// there, flat, with a tight shadow. The scroll drives it, nothing repeats on its own.
+// Easing is smoothed (lerp) so it follows the scroll without jumping.
+const SCROLL_PER_STICKER = 0.8 // screens of scroll for each sticker
+const HOLD = 0.12 // last share of the scroll, with everything already stuck
+const APPROACH = 0.74 // share of each sticker's turn spent flying in; the rest is the press
+
+// Tilt of the surface in the photo (degrees). The laptop is shot almost straight on, so just a hint.
+const TILT = { x: 1.5, y: -2, depth: 1200 }
 
 const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n))
 
-function useStackScroll(ref: React.RefObject<HTMLElement | null>) {
+function useWallScroll(ref: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     const section = ref.current
     if (!section) return
-    const cards = [...section.querySelectorAll<HTMLElement>('[data-stack-card]')]
+    const stickers = [...section.querySelectorAll<HTMLElement>('[data-wall-sticker]')]
+    const n = stickers.length
     let target = 0
     let current = 0
     let raf = 0
 
     const read = () => {
-      const r = section.getBoundingClientRect()
-      const range = r.height - window.innerHeight
-      target = range > 0 ? clamp(-r.top / range) : 0
+      const bounds = section.getBoundingClientRect()
+      const range = bounds.height - window.innerHeight
+      target = range > 0 ? clamp(-bounds.top / range) : 0
     }
 
-    const apply = (p: number) => {
-      const t = clamp(p / END) * (cards.length - 1)
-      cards.forEach((el, i) => {
-        const u = t - i // < 0: still behind, 0: in front, 0..1: leaving, > 1: gone
-        const out = el.offsetHeight + 60
-        let y = 0
-        let sx = 1
-        let opacity = 1
-        if (u <= 0) {
-          const d = -u
-          y = -Math.min(d, 3) * PEEK
-          sx = 1 - Math.min(d, 3) * SHRINK
-          opacity = clamp(3 - d)
-        } else if (u < 1) {
-          y = u * out
-          // Stays opaque while sliding (a half-faded card looks muddy over the next one, most of
-          // all on a dark background); it only fades once it is almost out of the frame.
-          opacity = 1 - clamp((u - 0.88) / 0.12)
-        } else {
-          y = out
-          opacity = 0
-        }
-        const front = Math.abs(u) < 0.5
-        el.style.transform = `translateY(${y.toFixed(1)}px) scaleX(${sx.toFixed(4)})`
-        el.style.opacity = opacity.toFixed(3)
-        el.style.zIndex = String(cards.length - i)
-        el.style.pointerEvents = front ? 'auto' : 'none'
-        // Only the front card is reachable by keyboard and assistive tech.
-        el.toggleAttribute('inert', !front)
+    // Stickers that are not moving (not started yet, or already stuck) are not touched again: the
+    // filter and the blend on every frame are expensive, and only the one in flight needs them.
+    const lastP: number[] = []
+
+    const apply = (progress: number) => {
+      const u = (progress * n) / (1 - HOLD)
+      stickers.forEach((el, index) => {
+        const item = featuredItems[index]
+        const p = clamp(u - index)
+        if (lastP[index] === p) return
+        lastP[index] = p
+        const a = clamp(p / APPROACH)
+        const e = a * a // accelerates into the wall
+        const lift = 1 - e
+        const press = Math.sin(Math.PI * clamp((p - APPROACH) / (1 - APPROACH)))
+        const scale = 1 + lift * 0.85 - 0.07 * press
+        const rotation = item.rotate + lift * item.from.spin
+        const stuck = p >= 1
+
+        // The tilt comes first (outermost): the sticker lies on the tilted plane of the window, so
+        // its own rotation and scale happen inside that plane.
+        el.style.transform =
+          `translate(-50%, -50%) perspective(${TILT.depth}px) rotateX(${TILT.x}deg) rotateY(${TILT.y}deg) ` +
+          `translate(${(lift * item.from.x).toFixed(1)}px, ${(lift * item.from.y).toFixed(1)}px) ` +
+          `rotate(${rotation.toFixed(2)}deg) scale(${scale.toFixed(4)})`
+        el.style.opacity = p <= 0 ? '0' : clamp(a * 5).toFixed(3)
+        // Stuck: a thin, tight contact shadow and slightly dimmed (glass takes some light off).
+        el.style.filter =
+          `brightness(${(0.92 + lift * 0.08).toFixed(3)}) ` +
+          `drop-shadow(0 ${(1 + lift * 30).toFixed(1)}px ${(1.5 + lift * 25).toFixed(1)}px rgb(8 10 20 / ${(0.5 + lift * 0.1).toFixed(2)}))`
+        el.style.zIndex = String(index + 1)
+        el.style.pointerEvents = stuck ? 'auto' : 'none'
+        el.toggleAttribute('inert', !stuck)
+      })
+    }
+
+    // Each sticker carries a copy of the photo that is masked by its own shape (see `sticker-gloss`),
+    // so the reflections of the glass pass over it. The copy must sit exactly where the photo is,
+    // so size and offset are measured here (offset* ignores transforms) and refreshed on resize.
+    const syncGloss = () => {
+      stickers.forEach((el) => {
+        const box = el.parentElement
+        if (!box) return
+        const w = box.offsetWidth
+        const h = box.offsetHeight
+        const photo = box.parentElement?.querySelector('img')
+        const nw = photo?.naturalWidth || 4
+        const nh = photo?.naturalHeight || 5
+        // The photo fills the box like object-fit: cover, centered across and pinned to the top.
+        const k = Math.max(w / nw, h / nh)
+        const pw = nw * k
+        const ph = nh * k
+        el.style.setProperty('--photo-w', `${pw}px`)
+        el.style.setProperty('--photo-h', `${ph}px`)
+        el.style.setProperty('--photo-x', `${(w - pw) / 2 - (el.offsetLeft - el.offsetWidth / 2)}px`)
+        el.style.setProperty('--photo-y', `${-(el.offsetTop - el.offsetHeight / 2)}px`)
       })
     }
 
@@ -66,55 +98,113 @@ function useStackScroll(ref: React.RefObject<HTMLElement | null>) {
       apply(current)
       raf = Math.abs(target - current) > 0.0005 ? requestAnimationFrame(frame) : 0
     }
-    const kick = () => {
+    const update = () => {
       if (!raf) raf = requestAnimationFrame(frame)
     }
 
+    const onResize = () => {
+      syncGloss()
+      update()
+    }
+
+    syncGloss()
     read()
     current = target
     apply(current)
-    window.addEventListener('scroll', kick, { passive: true })
-    window.addEventListener('resize', kick)
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', onResize)
     return () => {
-      window.removeEventListener('scroll', kick)
-      window.removeEventListener('resize', kick)
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', onResize)
       cancelAnimationFrame(raf)
     }
   }, [ref])
 }
 
-export function FeaturedStack({ intro, action }: { intro: ReactNode; action: ReactNode }) {
+export function FeaturedStack({ intro }: { intro: ReactNode }) {
   const ref = useRef<HTMLElement>(null)
-  useStackScroll(ref)
+  useWallScroll(ref)
   const n = featuredItems.length
 
   return (
     <section
       ref={ref}
       aria-labelledby="destacados-title"
-      style={{ height: `calc(100svh * (1 + ${SCROLL_PER_CARD} * ${n - 1}))` }}
+      style={{ height: `calc(100svh * (1 + ${SCROLL_PER_STICKER} * ${n}))` }}
     >
-      {/* overflow-hidden is safe here: it is on the sticky element itself, not on an ancestor. */}
-      <div className="sticky top-0 flex h-svh flex-col items-center justify-center overflow-hidden px-4 py-4 md:py-8">
-        {intro}
-        {/* Space above the stack = the strips of the cards behind (up to 3 x PEEK = 66 px) plus air,
-            so they never touch the title. The card size follows the real screen height: what is
-            subtracted is the rest of the content (intro, strips, button, paddings), so on short
-            screens the card shrinks instead of squeezing the layout. */}
-        <ul className="relative mt-[90px] aspect-[4/3] w-[min(88vw,52rem,calc((100svh-22rem)*1.3333))] shrink-0 md:mt-28 md:aspect-video md:w-[min(88vw,52rem,calc((100svh-28.5rem)*1.7778))]">
-          {featuredItems.map((item) => (
-            <li
-              key={item.slug}
-              data-stack-card
-              className="absolute inset-0 will-change-transform [transform-origin:50%_100%]"
-            >
-              <FeaturedCard item={item} />
-            </li>
-          ))}
-        </ul>
-        <div className="relative z-20 mt-6 shrink-0 md:mt-12">{action}</div>
-        <ScrollSticker className="pointer-events-none absolute bottom-2 right-2 z-10 size-14 md:bottom-8 md:right-8 md:size-36" />
-        {/* The stack is a visual device: assistive tech gets the whole list here. */}
+      <div className="sticky top-0 h-svh overflow-hidden">
+        {/* The wall is a photo (team request): the corner of a laptop, melting into the ink background
+            on its left edge (mobile: on its top edge) with a gradient. The stickers are placed in %
+            of this box. Desktop: the box is two thirds of the screen wide and as tall as it, and the
+            photo fills it from the top (object-top), so the keys, the speaker grille and the palm
+            rest all show and it reads as a laptop. Mobile: a 4:5 box at the bottom. Keep the photo
+            free of other stickers. */}
+        <div className="absolute bottom-0 right-0 aspect-[4/5] h-[70svh] md:bottom-auto md:top-0 md:aspect-auto md:h-svh md:w-[67vw]">
+          <img
+            src="/images/featured-laptop.jpg"
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            onLoad={() => window.dispatchEvent(new Event('resize'))}
+            className="absolute inset-0 h-full w-full select-none object-cover object-top"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-b from-tinta via-tinta/40 to-transparent to-45% md:bg-gradient-to-r md:from-tinta md:from-4% md:via-tinta/55 md:via-14% md:to-transparent md:to-40%"
+          />
+          {/* Hides the thin bright line of the trackpad edge that the photo has near its left side. */}
+          <div
+            aria-hidden="true"
+            className="absolute -inset-y-px -left-1 w-[calc(24%+0.25rem)] bg-gradient-to-r from-tinta from-60% to-transparent"
+          />
+          <ul className="absolute inset-0">
+            {featuredItems.map((item) => (
+              <li
+                key={item.slug}
+                data-wall-sticker
+                className="group absolute left-(--mx) top-(--my) w-(--mw) will-change-transform hover:z-[60]! focus-within:z-[60]! md:left-(--dx) md:top-(--dy) md:w-(--dw)"
+                style={
+                  {
+                    '--mx': `${item.x}%`,
+                    '--my': `${item.y}%`,
+                    '--mw': `${item.width}%`,
+                    '--dx': `${item.desktop.x}%`,
+                    '--dy': `${item.desktop.y}%`,
+                    '--dw': `${item.desktop.width}%`,
+                    opacity: 0,
+                  } as React.CSSProperties
+                }
+              >
+                <FeaturedCard item={item} />
+                <span
+                  aria-hidden="true"
+                  className="sticker-gloss"
+                  style={{
+                    maskImage: `url(${item.image})`,
+                    WebkitMaskImage: `url(${item.image})`,
+                  }}
+                />
+                {/* Paper label stuck under the sticker, shown on hover or keyboard focus. The sticker
+                    itself is already a link with its name, so this is only a visual extra. */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-full mt-3 -translate-x-1/2 scale-90 -rotate-2 whitespace-nowrap rounded-ui bg-crema px-4 py-2 text-center text-base font-bold leading-tight text-tinta opacity-0 shadow-sticker transition-[opacity,scale] duration-300 ease-spring group-focus-within:scale-100 group-focus-within:opacity-100 group-hover:scale-100 group-hover:opacity-100"
+                >
+                  {item.name}
+                  {item.price ? <span className="block font-medium text-naranja">{item.price}</span> : null}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {/* This layer spans the whole screen, so it lets the mouse through to the stickers; only the
+            text block takes it back (for the link). */}
+        <div className="pointer-events-none relative z-10 flex h-full items-start px-4 pt-[14svh] md:items-center md:px-8 md:pt-0">
+          <div className="w-full max-w-[88rem] md:mx-auto">
+            <div className="pointer-events-auto md:max-w-[min(34rem,45vw)]">{intro}</div>
+          </div>
+        </div>
+        <ScrollSticker className="pointer-events-none absolute bottom-2 left-2 z-10 size-14 md:bottom-8 md:left-8 md:size-28" />
         <p className="sr-only">
           Destacados: {featuredItems.map((i) => i.name).join(', ')}.
         </p>

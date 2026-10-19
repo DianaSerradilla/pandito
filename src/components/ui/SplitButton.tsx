@@ -8,6 +8,7 @@ import { Link, type LinkProps } from 'react-router'
 const tones = {
   azul: { root: 'text-crema', block: 'bg-azul' },
   crema: { root: 'text-tinta hover:text-crema', block: 'bg-crema' },
+  naranja: { root: 'text-crema', block: 'bg-naranja' },
 } as const
 
 type Tone = keyof typeof tones
@@ -27,7 +28,7 @@ function Blocks({ tone, children }: { tone: Tone; children: ReactNode }) {
     <>
       <span
         aria-hidden="true"
-        className={`grid w-10 place-items-center rounded-l-ui transition-colors duration-200 group-hover:bg-tinta ${block}`}
+        className={`grid w-10 place-items-center rounded-l-ui transition-colors duration-200 group-hover:bg-tinta ${tone === 'naranja' ? 'text-tinta' : ''} ${block}`}
       >
         <svg viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M2 8h12M8.5 2.5 14 8l-5.5 5.5" />

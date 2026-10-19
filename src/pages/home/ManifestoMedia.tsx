@@ -51,8 +51,8 @@ function PhotoCard({ src, alt = '', tone, thickBottom }: PhotoProps) {
   return (
     <div
       className={[
-        'rounded-ui border-[1.5px] border-tinta bg-crema p-2 sm:p-3',
-        thickBottom ? 'pb-8 sm:pb-12' : '',
+        'bg-white p-3 sm:p-4',
+        thickBottom ? 'pb-10 sm:pb-14' : '',
       ].join(' ')}
     >
       <div className="aspect-[4/5] overflow-hidden">
@@ -80,9 +80,9 @@ export function ManifestoMedia({ photos }: { photos: [PhotoProps, PhotoProps] })
   const innerClass = 'transition-transform duration-500 ease-soft will-change-transform'
 
   return (
-    <div className="relative mx-auto w-full max-w-[40rem] pb-12 md:mx-0">
+    <div className="relative mx-auto w-full max-w-[40rem] pb-12 md:mx-0 md:max-w-none md:pb-16">
       {/* Photo 1: large, tilted left */}
-      <div className="w-[68%] -rotate-3" onPointerEnter={enter('l')} onPointerLeave={leave}>
+      <div className="w-[74%] -rotate-3" onPointerEnter={enter('l')} onPointerLeave={leave}>
         <div className={innerClass} style={inner('l')}>
           <PhotoCard {...photos[0]} />
         </div>
@@ -90,7 +90,7 @@ export function ManifestoMedia({ photos }: { photos: [PhotoProps, PhotoProps] })
 
       {/* Photo 2: medium, bottom right, tilted right, with a thick polaroid bottom */}
       <div
-        className="absolute bottom-0 right-0 z-[1] w-[48%] rotate-[4deg]"
+        className="absolute bottom-[-2%] right-[-2%] z-[1] w-[54%] rotate-[4deg]"
         onPointerEnter={enter('m')}
         onPointerLeave={leave}
       >
@@ -101,7 +101,7 @@ export function ManifestoMedia({ photos }: { photos: [PhotoProps, PhotoProps] })
 
       {/* Sticker: the brand logotype with a die-cut border. Triggers the same state as photo 2. */}
       <div
-        className="absolute right-[22%] top-[16%] z-[2] w-[38%] -rotate-[8deg]"
+        className="absolute right-[13%] top-[11%] z-[2] w-[44%] -rotate-[8deg]"
         onPointerEnter={enter('m')}
         onPointerLeave={leave}
       >

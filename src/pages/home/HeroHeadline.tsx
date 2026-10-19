@@ -1,8 +1,7 @@
 import { Heading } from '../../components/ui/Heading'
 
-// Headline split into letters so each one can lift slightly near the cursor (useHeroMotion).
-// Letters are inline-block so they can be translated. Screen readers get the plain text; the
-// letters are decorative (aria-hidden).
+// Headline split into words so the hand-drawn Pandito signature can remain intact.
+// Screen readers get the plain text; the visual treatment is decorative.
 export function HeroHeadline({ id, lines }: { id: string; lines: string[] }) {
   const label = lines.join(' ')
   return (
@@ -13,16 +12,25 @@ export function HeroHeadline({ id, lines }: { id: string; lines: string[] }) {
           const words = line.split(' ')
           return (
             <span key={line} className="block">
-              {words.map((word, wi) => (
-                <span key={wi} className="inline-block whitespace-nowrap">
-                  {[...word].map((ch, ci) => (
-                    <span key={ci} data-letter className="inline-block">
-                      {ch}
-                    </span>
-                  ))}
-                  {wi < words.length - 1 ? ' ' : ''}
-                </span>
-              ))}
+              {words.map((word, wi) =>
+                word === 'Pandito.' ? (
+                  <span
+                    key={wi}
+                    className="inline-block whitespace-nowrap align-baseline font-script text-[0.66em] font-normal leading-none tracking-[-0.04em] text-naranja"
+                  >
+                    {word}
+                  </span>
+                ) : (
+                  <span key={wi} className="inline-block whitespace-nowrap">
+                    {[...word].map((ch, ci) => (
+                      <span key={ci} data-letter className="inline-block">
+                        {ch}
+                      </span>
+                    ))}
+                    {wi < words.length - 1 ? ' ' : ''}
+                  </span>
+                ),
+              )}
             </span>
           )
         })}

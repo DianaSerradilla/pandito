@@ -12,7 +12,6 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 // It stops with prefers-reduced-motion (static tape) and pauses while off screen.
 // Phrase: key message 4 of the manual, "Hecho en Mendoza". Provisional. Crema on tinta is an
 // approved pair. Decorative, so hidden from assistive tech.
-const PHRASE = 'HECHO EN MENDOZA'
 const SPEED = 45 // px per second: calm
 const PATH_ID = 'tape-curve'
 
@@ -37,12 +36,17 @@ function wavePath(width: number, height: number, amplitude: number) {
   return points.join(' ')
 }
 
-// One repetition of the phrase; the dot is orange (orange on ink is an approved use).
+// One repetition: the place name carries the emphasis and the separator uses the brand blue.
 function Unit() {
   return (
     <>
-      <tspan>{PHRASE}</tspan>
-      <tspan className="fill-naranja">{'  ●  '}</tspan>
+      <tspan fontFamily="var(--font-sans)" fontWeight={400}>
+        Hecho en{' '}
+      </tspan>
+      <tspan fontFamily="var(--font-sans)" fontWeight={700}>
+        Mendoza
+      </tspan>
+      <tspan className="fill-azul">{'  ●  '}</tspan>
     </>
   )
 }
