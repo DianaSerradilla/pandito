@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SafeImage } from '../../components/ui/SafeImage'
 import { useCursorMotion } from '../../hooks/useCursorMotion'
 
 // Two photo cards and a sticker, tilted and overlapping, as in the approved reference.
@@ -24,11 +25,11 @@ const states: Record<Active, Record<Part, string>> = {
   },
 }
 
-function Placeholder({ tone }: { tone: 'azul' | 'tinta' }) {
+function Placeholder({ tone, label = 'Foto de ejemplo' }: { tone: 'azul' | 'tinta'; label?: string }) {
   return (
     <div
       role="img"
-      aria-label="Foto de ejemplo"
+      aria-label={label}
       className={`grid h-full w-full place-items-center text-crema ${tone === 'azul' ? 'bg-azul' : 'bg-tinta'}`}
     >
       <svg viewBox="0 0 48 48" aria-hidden="true" className="w-1/4 opacity-60" fill="currentColor">
@@ -57,7 +58,12 @@ function PhotoCard({ src, alt = '', tone, thickBottom }: PhotoProps) {
     >
       <div className="aspect-[4/5] overflow-hidden">
         {src ? (
-          <img src={src} alt={alt} className="h-full w-full object-cover" />
+          <SafeImage
+            src={src}
+            alt={alt}
+            fallback={<Placeholder tone={tone} label="Foto no disponible" />}
+            className="h-full w-full object-cover"
+          />
         ) : (
           <Placeholder tone={tone} />
         )}

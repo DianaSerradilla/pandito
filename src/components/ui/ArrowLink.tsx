@@ -9,7 +9,7 @@ type Props = LinkProps & {
 
 const rootClass = (className?: string) =>
   [
-    'group inline-flex items-center gap-2.5 font-sans text-base font-semibold md:text-lg',
+    'group inline-flex min-h-11 items-center gap-2.5 font-sans text-base font-semibold md:text-lg',
     className,
   ]
     .filter(Boolean)
@@ -58,6 +58,7 @@ export function ArrowAnchor({
   return (
     <a target="_blank" rel="noopener noreferrer" className={rootClass(className)} {...props}>
       <Content mark={mark}>{children}</Content>
+      <span className="sr-only"> (se abre en otra pestaña)</span>
     </a>
   )
 }

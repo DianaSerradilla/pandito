@@ -90,6 +90,8 @@ function useLineDraw(reduce: boolean, sectionRef: RefObject<HTMLElement | null>)
     }
 
     const apply = (progress: number) => {
+      // The line has no path until the wide layout has been built (e.g. a phone turned sideways).
+      if (total <= 0) return
       const length = progress * total
       line.style.strokeDashoffset = String(Math.max(0, total - length))
       const point = line.getPointAtLength(length)
@@ -211,7 +213,8 @@ function useLineDraw(reduce: boolean, sectionRef: RefObject<HTMLElement | null>)
   return { bandRef, listRef }
 }
 
-export function HowToBuySection() {
+// `headingAs` is h2 on the Home and h1 on the "Cómo comprar" page, where it opens the page.
+export function HowToBuySection({ headingAs = 'h2' }: { headingAs?: 'h1' | 'h2' }) {
   const reduce = usePrefersReducedMotion()
   const sectionRef = useRef<HTMLElement>(null)
   const { bandRef, listRef } = useLineDraw(reduce, sectionRef)
@@ -223,7 +226,7 @@ export function HowToBuySection() {
       labelledBy="como-comprar-title"
       className="how-buy-section relative isolate p-0! md:h-[240svh]"
     >
-      <div className="overflow-hidden py-12 md:sticky md:top-0 md:flex md:h-svh md:flex-col md:justify-center md:py-0">
+      <div className="overflow-hidden py-12 md:sticky md:top-0 md:flex md:h-svh md:flex-col md:justify-center md:py-0 md:pt-[4.75rem]">
         <style>{`
           .how-armed [data-step] .how-marker,
           .how-armed [data-step] .how-body {
@@ -250,7 +253,7 @@ export function HowToBuySection() {
         <div className="mx-auto w-full max-w-[84rem]">
           <div className="mx-auto max-w-2xl text-center">
             <Script>Pedilo sin vueltas</Script>
-            <Heading id="como-comprar-title" as="h2" size="headline" family="sans" className="mt-3 text-balance">
+            <Heading id="como-comprar-title" as={headingAs} size="headline" family="sans" className="mt-3 text-balance">
               <span className="block font-normal">Tres pasos</span>
               <span className="block font-extrabold md:text-[1.2em]">y ya está.</span>
             </Heading>
@@ -260,7 +263,7 @@ export function HowToBuySection() {
           </div>
 
           {/* The strip the line is drawn on. Decorative. */}
-          <div ref={bandRef} aria-hidden="true" className="pointer-events-none relative mt-6 hidden h-24 md:block">
+          <div ref={bandRef} aria-hidden="true" className="pointer-events-none relative mt-6 hidden h-24 md:block [@media(min-width:768px)_and_(max-height:860px)]:mt-1">
             <svg className="absolute inset-0 overflow-visible" fill="none">
               <defs>
                 {/* A touch of roughness on the edge, like marker on paper. */}
@@ -326,7 +329,7 @@ export function HowToBuySection() {
             ))}
           </ol>
 
-          <div className="mt-10 flex justify-center md:mt-12">
+          <div className="mt-10 flex justify-center md:mt-12 [@media(min-width:768px)_and_(max-height:860px)]:mt-3">
             <ArrowAnchor
               href={site.whatsappUrl}
               mark

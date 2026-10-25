@@ -7,9 +7,10 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { FeaturedCard } from './FeaturedCard'
 import { FeaturedStack } from './FeaturedStack'
 import { ScrollSticker } from './ScrollSticker'
-import { featuredItems } from './featuredItems'
+import { featuredItems } from '../../data/publicCatalog'
 
-const allFeaturedHref = `${paths.catalog}?filtro=destacados`
+// There is no "most requested" list yet (it will come from real sales), so this goes to the whole catalog.
+const allFeaturedHref = paths.catalog
 
 function Intro({ desktopLeft = false }: { desktopLeft?: boolean }) {
   return (

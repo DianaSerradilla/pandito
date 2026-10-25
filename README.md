@@ -53,6 +53,11 @@ Comprobación rápida del servidor: `http://localhost:3001/api/health` devuelve 
 src/components/ui/       componentes base (Button, Heading, Script, Tag, Container, StatusMessage)
 src/components/layout/   header, footer y layout compartido
 src/pages/               una página por ruta (placeholders hasta cada REQ)
+src/data/                datos públicos del sitio (publicCatalog.ts es la única puerta; hoy lee de ejemplos, luego Supabase)
+src/pages/today/         HOY: tarjetas, filtros y datos de ejemplo (todayItems.ts)
+src/pages/shop/          Listado de tienda compartido por HOY y Catálogo (buscar, ordenar, filtrar, pedido)
+src/pages/catalog/       Catálogo: datos de ejemplo y filtro de temas (búsqueda + familias)
+src/pages/about/         Estudio: héroe con stickers girando, texto y los tres bloques de servicios
 src/lib/                 clientes y utilidades (supabase.ts)
 server/                  lógica de servidor Node (validaciones, exportaciones, operaciones privilegiadas)
 src/components/pando/    Pando como SVG inline (formas generadas, ver abajo)
@@ -102,3 +107,15 @@ Para ver todo junto: con `npm run dev`, abrí `/_tokens`. Esa ruta existe solo e
 - Supabase es la fuente de datos y la autenticación. Excel es solo exportación y respaldo.
 - Ninguna clave real va al repositorio ni al cliente. La service role key solo existe en el servidor.
 - `public/favicon.svg` es el de Vite y es temporal.
+
+## Enlace del QR de HOY (HOY-003)
+
+- El enlace estable es `<dominio>/hoy`. No lleva parámetros, así que el QR no cambia entre eventos: lo que cambia es el estado del evento (activo, inactivo, vencido o vacío).
+- Si no hay evento activo, `/hoy` muestra un mensaje claro sin datos del evento.
+- Pendiente del equipo: dominio final y herramienta para generar el QR. Generarlo con el dominio definitivo y probarlo desde un celular.
+
+## Sitemap y robots (QUALITY-003)
+
+- `npm run build` genera `dist/robots.txt` y, si está definida `VITE_SITE_URL` (dominio final, sin barra al final), `dist/sitemap.xml`. Sin dominio no se inventa ninguna dirección: no hay sitemap ni línea `Sitemap`.
+- No se listan el pedido (`/mi-pedido`, noindex), `/api` ni `/_tokens` (solo existe en desarrollo).
+- Pendiente: las fichas de producto entran al sitemap cuando el catálogo se lea de Supabase, y hay que probarlo contra el dominio real.

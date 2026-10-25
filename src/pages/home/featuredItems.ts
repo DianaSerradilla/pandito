@@ -36,7 +36,7 @@ export type FeaturedItem = {
 // Keep them inside the laptop: up to about 87% across and, on desktop, between 25% and 90% down.
 export const featuredItems: FeaturedItem[] = [
   {
-    slug: 'ejemplo-uno',
+    slug: 'cat-01',
     name: 'Sticker isotipo',
     image: '/stickers/isotipo-disc.svg',
     x: 76,
@@ -47,7 +47,7 @@ export const featuredItems: FeaturedItem[] = [
     from: { x: 90, y: -70, spin: 28 },
   },
   {
-    slug: 'ejemplo-dos',
+    slug: 'cat-02',
     name: 'Sticker Pando',
     image: '/brand/pando.svg',
     cut: true,
@@ -59,7 +59,7 @@ export const featuredItems: FeaturedItem[] = [
     from: { x: -100, y: -40, spin: -24 },
   },
   {
-    slug: 'ejemplo-tres',
+    slug: 'cat-03',
     name: 'Sticker logotipo',
     image: '/stickers/logotipo-label.svg',
     x: 66,
@@ -70,7 +70,7 @@ export const featuredItems: FeaturedItem[] = [
     from: { x: 100, y: 70, spin: 20 },
   },
   {
-    slug: 'ejemplo-cuatro',
+    slug: 'cat-04',
     name: 'Sticker ojo',
     image: '/stickers/star-eye.svg',
     x: 54,
@@ -81,7 +81,7 @@ export const featuredItems: FeaturedItem[] = [
     from: { x: -30, y: -100, spin: -30 },
   },
   {
-    slug: 'ejemplo-cinco',
+    slug: 'cat-05',
     name: 'Sticker mano',
     image: '/brand/pando-mano-senalar.svg',
     cut: true,

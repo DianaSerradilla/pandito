@@ -3,21 +3,28 @@ import { useCursorMotion } from '../../hooks/useCursorMotion'
 
 // Stickers that pop out along the mouse path (reference: the closing section of extrafazant.nl).
 // Observed behavior, reproduced with our own values (the reference timing could not be measured):
-// every ~110 px of mouse travel one sticker appears at the cursor, tilted at random, pops in,
+// every few hundred px of mouse travel one sticker appears at the cursor, tilted at random, pops in,
 // stays a moment and fades. A small pool of elements is reused, so nothing piles up.
 // The stickers are PLACEHOLDERS made from brand pieces; swap `stickers` for the real designs.
 // They sit on the ink background, where the orange logo and isotipo are approved. If this ever
 // moves to azul or yellow, give the logo and isotipo a cream plate (the manual forbids them there).
 // Only with a mouse and without prefers-reduced-motion; otherwise three static stickers are shown.
 // Decorative, so hidden from assistive tech. Stickers sit behind the text.
+//
+// Team adjustments: stickers come out less often (far apart and never too soon after the last one),
+// are bigger, and never appear close to an edge of the section, so none is cut off. `aspect` is the
+// height over the width of each piece, used to know how much room it needs.
 const stickers = [
-  { src: '/brand/isotipo-naranja.svg', width: 84 },
-  { src: '/brand/logotipo-naranja.svg', width: 180 },
-  { src: '/brand/pando.svg', width: 96 },
+  { src: '/brand/isotipo-naranja.svg', width: 120, aspect: 135.8 / 91.4 },
+  { src: '/brand/logotipo-naranja.svg', width: 250, aspect: 175 / 371 },
+  { src: '/brand/pando.svg', width: 140, aspect: 757 / 385 },
 ]
-const POOL = 10
-const SPACING = 110 // px of mouse travel between stickers
-const LIFETIME = 1700 // ms
+const POOL = 12
+const SPACING = 140 // px of mouse travel between stickers
+const MIN_GAP = 220 // ms between one sticker and the next
+const LIFETIME = 2400 // ms
+const EDGE = 28 // px of clear space kept between a sticker and the edge of the section
+const TILT_ROOM = 1.3 // a tilted sticker takes up a bit more than its own box
 
 function StaticStickers() {
   return (
@@ -25,17 +32,17 @@ function StaticStickers() {
       <img
         src={stickers[1].src}
         alt=""
-        className="die-cut absolute left-[5%] top-[14%] w-32 -rotate-[10deg] md:w-44"
+        className="die-cut absolute left-[5%] top-[14%] w-40 -rotate-[10deg] md:w-60"
       />
       <img
         src={stickers[2].src}
         alt=""
-        className="die-cut absolute right-[7%] top-[18%] w-16 rotate-[9deg] md:w-24"
+        className="die-cut absolute right-[7%] top-[18%] w-20 rotate-[9deg] md:w-32"
       />
       <img
         src={stickers[0].src}
         alt=""
-        className="die-cut absolute bottom-[14%] left-[14%] w-14 rotate-[7deg] md:w-20"
+        className="die-cut absolute bottom-[14%] left-[14%] w-16 rotate-[7deg] md:w-28"
       />
     </div>
   )
@@ -62,18 +69,26 @@ export function StickerTrail({ sectionRef }: { sectionRef: RefObject<HTMLElement
     let kind = 0
     let lastX = -1e9
     let lastY = -1e9
+    let lastTime = 0
 
     const onMove = (e: PointerEvent) => {
       const box = layer.getBoundingClientRect()
       const x = e.clientX - box.left
       const y = e.clientY - box.top
       if (Math.hypot(x - lastX, y - lastY) < SPACING) return
+      if (e.timeStamp - lastTime < MIN_GAP) return
+
+      // Not near an edge: the whole sticker, tilted, has to fit inside the section.
+      const sticker = stickers[kind]
+      const halfW = (sticker.width / 2) * TILT_ROOM + EDGE
+      const halfH = ((sticker.width * sticker.aspect) / 2) * TILT_ROOM + EDGE
+      if (x < halfW || x > box.width - halfW || y < halfH || y > box.height - halfH) return
       lastX = x
       lastY = y
+      lastTime = e.timeStamp
 
       const el = pool[next]
       next = (next + 1) % POOL
-      const sticker = stickers[kind]
       kind = (kind + 1) % stickers.length
       el.getAnimations().forEach((a) => a.cancel())
       el.src = sticker.src

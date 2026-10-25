@@ -10,7 +10,7 @@ export const stickerBase = [
 ].join(' ')
 
 export const stickerSize = {
-  md: 'px-3.5 py-1.5 text-label',
+  md: 'min-h-11 px-3.5 py-1.5 text-label',
   lg: 'px-6 py-3 text-xl',
   menu: 'px-5 py-2 text-2xl',
 } as const

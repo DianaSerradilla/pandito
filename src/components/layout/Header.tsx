@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { paths } from '../../paths'
 import { site } from '../../config/site'
+import { useOrderCount } from '../../lib/orderStore'
 import { Container } from '../ui/Container'
 import { stickerBase, stickerSize, stickerTone, tilt } from '../ui/sticker'
 import { cartNav, mainNav } from './navItems'
@@ -14,6 +15,8 @@ const tiltAt = (i: number) => tilt(tilts[i % tilts.length])
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const orderCount = useOrderCount()
 
   useEffect(() => {
     if (!open) return
@@ -24,16 +27,26 @@ export function Header() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
+  // A thin line appears under the bar once the page has moved, so it reads as a bar over the content.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const close = () => setOpen(false)
 
   return (
-    <header className="relative z-20">
+    <header
+      className={`sticky top-0 z-50 border-b-[1.5px] transition-colors duration-200 ${scrolled || open ? 'border-tinta/20 bg-crema' : 'border-transparent bg-transparent'}`}
+    >
       <Container
         size="wide"
         className="flex items-center justify-between gap-2 py-4 md:grid md:grid-cols-[1fr_auto_1fr] md:gap-4"
       >
         {/* Isotipo P: the manual's version for small sizes. Orange on cream. */}
-        <Link to={paths.home} onClick={close} className="shrink-0 justify-self-start">
+        <Link to={paths.home} onClick={close} className="inline-flex min-w-11 shrink-0 items-center justify-self-start">
           <img src="/brand/isotipo-naranja.svg" alt={site.name} className="h-11 w-auto max-w-none" />
         </Link>
 
@@ -67,6 +80,14 @@ export function Header() {
               className="size-2 rounded-full bg-naranja group-hover:bg-tinta group-aria-[current=page]:bg-crema"
             />
             {cartNav.label}
+            {orderCount > 0 && (
+              <>
+                <span aria-hidden="true" className="grid min-w-5 place-items-center rounded-full bg-naranja px-1 text-xs font-bold text-tinta">
+                  {orderCount}
+                </span>
+                <span className="sr-only">, {orderCount === 1 ? '1 producto' : `${orderCount} productos`}</span>
+              </>
+            )}
           </NavLink>
           <button
             type="button"
@@ -85,7 +106,7 @@ export function Header() {
         <nav
           id="menu-movil"
           aria-label="Principal"
-          className="border-b-2 border-tinta px-4 pb-8 pt-2 md:hidden"
+          className="max-h-[calc(100svh-4.75rem)] overflow-y-auto overscroll-contain border-b-2 border-tinta px-4 pb-8 pt-2 md:hidden"
         >
           <ul className="flex flex-col items-start gap-4">
             {mainNav.map((item, i) => (

@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { featuredItems } from './featuredItems'
+import { featuredItems } from '../../data/publicCatalog'
 import { FeaturedCard } from './FeaturedCard'
 import { ScrollSticker } from './ScrollSticker'
 

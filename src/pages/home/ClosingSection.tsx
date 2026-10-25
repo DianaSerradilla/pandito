@@ -1,12 +1,13 @@
 import { useRef } from 'react'
 import { site } from '../../config/site'
-import { SplitButtonAnchor } from '../../components/ui/SplitButton'
+import { ArrowAnchor } from '../../components/ui/ArrowLink'
 import { StickerTrail } from './StickerTrail'
 
 // Closing block (REQ-WEB-HOME-001), composition after the closing section of extrafazant.nl:
 // a big two-line question, a short answer, one button, and stickers that pop out as the mouse moves.
 // tinta background with crema text (an approved pair), the same ink as the footer so the two read
-// as one dark block with no visible seam. The Rock Salt line is yellow on ink (approved).
+// as one dark block with no visible seam. The Rock Salt line is naranja on ink (approved), and the
+// button is the same text link with the hand-drawn underline as the other main actions.
 // PROVISIONAL COPY in Pando's voice, from the team's idea ("¿Diseños personalizados? Sí, obvio.
 // Pedilos."). The button opens WhatsApp in a new tab, like the "¿Dudas?" one.
 export function ClosingSection() {
@@ -28,18 +29,18 @@ export function ClosingSection() {
             <span className="block font-extrabold">¿Diseños</span>
             <span className="block font-normal">personalizados?</span>
           </h2>
-          <p className="mt-6 font-script text-script text-amarillo">Sí, obvio. Pedilos.</p>
+          <p className="mt-6 font-script text-script text-naranja">Sí, obvio. Pedilos.</p>
           <p className="mt-4 max-w-md text-balance md:text-lg">
             Contame qué tenés en mente y lo diseño yo.
           </p>
           <div className="mt-10">
-            <SplitButtonAnchor
+            <ArrowAnchor
               href={site.whatsappUrl}
-              tone="crema"
+              mark
               aria-label="Pedí tu diseño personalizado por WhatsApp (se abre en una pestaña nueva)"
             >
               Pedí el tuyo
-            </SplitButtonAnchor>
+            </ArrowAnchor>
           </div>
         </div>
       </section>

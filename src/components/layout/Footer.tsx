@@ -5,7 +5,7 @@ import { Heading } from '../ui/Heading'
 import { Scribble } from './Scribble'
 import { footerNav } from './navItems'
 
-const linkClass = 'group relative inline-block py-0.5'
+const linkClass = 'group relative inline-flex min-h-11 items-center'
 
 const year = new Date().getFullYear()
 
@@ -59,6 +59,7 @@ export function Footer() {
                     className={linkClass}
                   >
                     WhatsApp
+                    <span className="sr-only"> (se abre en otra pestaña)</span>
                     <Scribble active={false} />
                   </a>
                 </li>
@@ -79,6 +80,7 @@ export function Footer() {
                       className={linkClass}
                     >
                       {l.label}
+                      <span className="sr-only"> (se abre en otra pestaña)</span>
                       <Scribble active={false} />
                     </a>
                   </li>
@@ -95,7 +97,7 @@ export function Footer() {
             type="button"
             onClick={scrollToTop}
             aria-label="Volver arriba"
-            className="grid size-10 place-items-center rounded-ui bg-crema text-tinta hover:bg-amarillo"
+            className="grid size-11 shrink-0 place-items-center rounded-ui bg-crema text-tinta hover:bg-amarillo"
           >
             <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M8 14V2M2.5 7.5 8 2l5.5 5.5" />
