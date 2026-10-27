@@ -124,6 +124,8 @@ export function CartPage() {
                   className={`grid aspect-square place-items-center overflow-hidden rounded-[0.25rem] border-[1.5px] border-tinta ${tones[line.item.tone]}`}
                 >
                   <img
+                    loading="lazy"
+                    decoding="async"
                     src={line.item.image}
                     alt=""
                     draggable={false}

@@ -59,6 +59,8 @@ function PhotoCard({ src, alt = '', tone, thickBottom }: PhotoProps) {
       <div className="aspect-[4/5] overflow-hidden">
         {src ? (
           <SafeImage
+            loading="lazy"
+            decoding="async"
             src={src}
             alt={alt}
             fallback={<Placeholder tone={tone} label="Foto no disponible" />}

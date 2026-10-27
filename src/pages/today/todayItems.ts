@@ -12,6 +12,14 @@ export const todayEvent: { status: TodayStatus; name: string; context: string } 
   context: 'Lugar y horario a confirmar.',
 }
 
+/** The least a piece needs to be listed, searched and filtered by the shop listing. A download
+ *  (REQ-WEB-DOWNLOAD-001) is one too: it has no price. */
+export type ListingItem = { slug: string; name: string; kind: string; price?: number }
+
+/** What the listing is made of, for the labels ("diseño" in the shop, "recurso" in the downloads). */
+export type Noun = { one: string; many: string }
+export const designNoun: Noun = { one: 'diseño', many: 'diseños' }
+
 export type TodayTone = 'azul' | 'naranja' | 'amarillo' | 'tinta'
 
 export type TodayItem = {
@@ -46,7 +54,7 @@ export type TodayFilterOption = { key: string; label: string }
 
 /** A list of options in the filter column (e.g. Categoría). Several can be picked inside a group
  *  (any of them); the groups combine (all of them), as in any online shop. */
-export type TodayFilterGroup<T extends TodayItem = TodayItem> = {
+export type TodayFilterGroup<T extends ListingItem = TodayItem> = {
   key: string
   label: string
   options: TodayFilterOption[]

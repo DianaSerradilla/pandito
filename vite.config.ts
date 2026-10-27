@@ -10,7 +10,7 @@ import { paths } from './src/paths.ts'
 // address. Left out on purpose: the cart (noindex), /api and the dev-only /_tokens, which does not
 // exist in the production build. PENDING: product pages come in once the catalog is read from
 // Supabase at build time.
-const indexableRoutes = [paths.home, paths.about, paths.catalog, paths.today, paths.howToBuy]
+const indexableRoutes = [paths.home, paths.about, paths.catalog, paths.today, paths.howToBuy, paths.downloads]
 const blockedRoutes = [paths.cart, '/api/']
 
 function seoFiles(siteUrl: string): Plugin {

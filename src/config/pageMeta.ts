@@ -29,6 +29,10 @@ export const routeMeta: Record<string, PageMeta> = {
     title: pageTitle(navLabels.howToBuy),
     description: 'Cómo pedir en Pandito: elegís tus stickers, armás el pedido y lo mandás por WhatsApp.',
   },
+  [paths.downloads]: {
+    title: pageTitle(navLabels.downloads),
+    description: 'Fondos de pantalla y stickers de Pandito para bajar gratis, sin cuenta. Para uso personal.',
+  },
   [paths.cart]: {
     title: pageTitle(navLabels.cart),
     description: 'Tu pedido de stickers antes de enviarlo por WhatsApp.',

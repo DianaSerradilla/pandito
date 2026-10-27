@@ -43,6 +43,8 @@ export type {
 
 export { availabilityOf } from './sampleAvailability'
 export type { Availability } from './sampleAvailability'
+export { downloadFilterGroups, downloadItems } from './sampleDownloads'
+export type { DownloadItem, DownloadKind } from './sampleDownloads'
 export { stickerUses } from './sampleUses'
 export { promoGroups } from './samplePromos'
 export type { Pack, PromoGroup } from './samplePromos'

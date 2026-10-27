@@ -23,6 +23,8 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           {/* Cream logotype on ink: team decision (the manual's default on ink is orange). */}
           <img
+            loading="lazy"
+            decoding="async"
             src="/brand/logotipo-crema.svg"
             alt={site.name}
             className="h-auto w-64 self-start md:w-80"

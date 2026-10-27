@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { stickerBase, stickerSize, stickerTone, tilt } from '../../components/ui/sticker'
+import { designNoun, type Noun } from './todayItems'
 
 // Row above the HOY listing: search, sort, how many pieces match, the switch between large and
 // compact tiles (wide screens) and, below 1024 px, the button that opens the filters in a sheet from
@@ -17,6 +18,9 @@ const sortOptions: { key: TodaySort; label: string }[] = [
 ]
 
 type Props = {
+  /** Which sort options to offer; all of them by default. */
+  sortKeys?: TodaySort[]
+  noun?: Noun
   query: string
   onQuery: (value: string) => void
   sort: TodaySort
@@ -33,7 +37,7 @@ type Props = {
 
 const small = `${stickerBase} ${stickerSize.md} min-h-11 cursor-pointer`
 
-export function TodayToolbar({ query, onQuery, sort, onSort, view, onView, count, activeFilters, sheet }: Props) {
+export function TodayToolbar({ sortKeys, noun = designNoun, query, onQuery, sort, onSort, view, onView, count, activeFilters, sheet }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [open, setOpen] = useState(false)
 
@@ -48,7 +52,7 @@ export function TodayToolbar({ query, onQuery, sort, onSort, view, onView, count
     <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
       <div role="search" className="min-w-0 basis-full md:basis-auto md:flex-1 md:max-w-sm">
         <label className="relative block">
-          <span className="sr-only">Buscar un diseño</span>
+          <span className="sr-only">Buscar un {noun.one}</span>
           <svg
             aria-hidden="true"
             viewBox="0 0 20 20"
@@ -65,7 +69,7 @@ export function TodayToolbar({ query, onQuery, sort, onSort, view, onView, count
             type="search"
             value={query}
             onChange={(event) => onQuery(event.target.value)}
-            placeholder="Buscar un diseño"
+            placeholder={`Buscar un ${noun.one}`}
             autoComplete="off"
             className="min-h-11 w-full rounded-ui border-[1.5px] border-tinta bg-crema py-2 pl-9 pr-3 text-base shadow-sticker placeholder:text-tinta/70"
           />
@@ -89,7 +93,7 @@ export function TodayToolbar({ query, onQuery, sort, onSort, view, onView, count
           onChange={(event) => onSort(event.target.value as TodaySort)}
           className="min-h-11 min-w-0 flex-1 cursor-pointer rounded-ui border-[1.5px] border-tinta bg-crema px-2.5 text-base font-medium"
         >
-          {sortOptions.map((option) => (
+          {sortOptions.filter((option) => !sortKeys || sortKeys.includes(option.key)).map((option) => (
             <option key={option.key} value={option.key}>
               {option.label}
             </option>
@@ -98,7 +102,7 @@ export function TodayToolbar({ query, onQuery, sort, onSort, view, onView, count
       </label>
 
       <p aria-hidden="true" className="ml-auto hidden whitespace-nowrap text-sm font-medium text-tinta/75 lg:block md:text-base">
-        {count === 1 ? '1 diseño' : `${count} diseños`}
+        {count === 1 ? `1 ${noun.one}` : `${count} ${noun.many}`}
       </p>
 
       <div role="group" aria-label="Tamaño de las tarjetas" className="hidden shrink-0 gap-2 md:flex">
@@ -140,7 +144,7 @@ export function TodayToolbar({ query, onQuery, sort, onSort, view, onView, count
         {sheet}
         <div className="sticky bottom-0 -mx-5 mt-4 flex gap-3 border-t-[1.5px] border-tinta/20 bg-crema px-5 pb-1 pt-4">
           <button type="button" onClick={() => setOpen(false)} className={`${stickerBase} ${stickerSize.md} ${stickerTone.ink} min-h-11 flex-1 cursor-pointer`}>
-            Ver {count === 1 ? '1 diseño' : `${count} diseños`}
+            Ver {count === 1 ? `1 ${noun.one}` : `${count} ${noun.many}`}
           </button>
         </div>
       </dialog>

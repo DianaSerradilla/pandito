@@ -46,7 +46,7 @@ export function FilterOption({ id, label, count, checked, onChange }: OptionProp
       <span className="flex-1">{label}</span>
       <span className="text-sm tabular-nums text-tinta/75">
         <span aria-hidden="true">{count}</span>
-        <span className="sr-only">{count === 1 ? ', 1 diseño' : `, ${count} diseños`}</span>
+        <span className="sr-only">{count === 1 ? ', 1 resultado' : `, ${count} resultados`}</span>
       </span>
     </label>
   )

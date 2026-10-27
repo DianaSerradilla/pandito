@@ -151,6 +151,8 @@ export function ProductGallery({ item, material, size }: Props) {
           {current.key === 'uso' && (
             <>
               <SafeImage
+                loading="lazy"
+                decoding="async"
                 src="/images/featured-laptop.jpg"
                 alt=""
                 draggable={false}

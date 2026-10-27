@@ -15,5 +15,6 @@ export const footerNav: { to: string; label: string }[] = [
     item.to === paths.today ? { to: item.to, label: navLabels.todayFooter } : item,
   ),
   { to: paths.howToBuy, label: navLabels.howToBuy },
+  { to: paths.downloads, label: navLabels.downloads },
   cartNav,
 ]

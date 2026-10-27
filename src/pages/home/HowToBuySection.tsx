@@ -213,6 +213,11 @@ function useLineDraw(reduce: boolean, sectionRef: RefObject<HTMLElement | null>)
   return { bandRef, listRef }
 }
 
+// The step titles sit one level under the section heading, so the outline never skips a level.
+function StepTitle({ as: Tag, children }: { as: 'h2' | 'h3'; children: string }) {
+  return <Tag className="font-display text-3xl uppercase tracking-[-0.02em] text-tinta md:text-4xl">{children}</Tag>
+}
+
 // `headingAs` is h2 on the Home and h1 on the "Cómo comprar" page, where it opens the page.
 export function HowToBuySection({ headingAs = 'h2' }: { headingAs?: 'h1' | 'h2' }) {
   const reduce = usePrefersReducedMotion()
@@ -308,7 +313,7 @@ export function HowToBuySection({ headingAs = 'h2' }: { headingAs?: 'h1' | 'h2' 
                   >
                     {step.number}
                   </span>
-                  <h3 className="font-display text-3xl uppercase tracking-[-0.02em] text-tinta md:text-4xl">{step.title}</h3>
+                  <StepTitle as={headingAs === 'h1' ? 'h2' : 'h3'}>{step.title}</StepTitle>
                 </div>
                 <p className="how-body mt-5 max-w-[19rem] xl:max-w-[16rem] text-pretty leading-relaxed text-tinta/80 md:text-lg">{step.text}</p>
 

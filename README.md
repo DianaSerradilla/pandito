@@ -119,3 +119,10 @@ Para ver todo junto: con `npm run dev`, abrí `/_tokens`. Esa ruta existe solo e
 - `npm run build` genera `dist/robots.txt` y, si está definida `VITE_SITE_URL` (dominio final, sin barra al final), `dist/sitemap.xml`. Sin dominio no se inventa ninguna dirección: no hay sitemap ni línea `Sitemap`.
 - No se listan el pedido (`/mi-pedido`, noindex), `/api` ni `/_tokens` (solo existe en desarrollo).
 - Pendiente: las fichas de producto entran al sitemap cuando el catálogo se lea de Supabase, y hay que probarlo contra el dominio real.
+
+## Enlace de campaña a las descargas (DOWNLOAD-002)
+
+- Biblioteca: `<dominio>/descargas`. Un recurso concreto: `<dominio>/descargas?recurso=<slug>` (lo muestra arriba, con la biblioteca debajo). Si el slug no existe, abre la biblioteca normal.
+- La página no depende de que haya campaña activa.
+- Los parámetros `utm_*` se aceptan y no hacen nada: todavía no se mide nada hasta que el equipo apruebe la analítica (QUALITY-006). No se pide email.
+- Pendiente del equipo: URL final, convención de enlaces de campaña, palabra clave y métricas a observar.

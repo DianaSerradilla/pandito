@@ -10,7 +10,7 @@ import { orderTotal } from '../product/productData'
 import { TodayCard } from '../today/TodayCard'
 import { TodayFilterList, type TodaySelection } from '../today/TodayFilterList'
 import { TodayToolbar, type TodaySort, type TodayView } from '../today/TodayToolbar'
-import { formatPrice, type TodayFilterGroup, type TodayItem } from '../today/todayItems'
+import { designNoun, formatPrice, type ListingItem, type Noun, type TodayFilterGroup, type TodayItem } from '../today/todayItems'
 
 // The shop part shared by HOY and the Catalog: search, sort, filters (a column on wide screens, a
 // sheet on phones), the grid in batches and the bar with the order so far. Each page brings its
@@ -20,11 +20,11 @@ import { formatPrice, type TodayFilterGroup, type TodayItem } from '../today/tod
 // más". The order is kept by lib/orderStore; prices are SAMPLES until the team approves them.
 const PAGE_SIZE = 12
 
-const sorters: Record<TodaySort, ((a: TodayItem, b: TodayItem) => number) | null> = {
+const sorters: Record<TodaySort, ((a: ListingItem, b: ListingItem) => number) | null> = {
   featured: null,
   name: (a, b) => a.name.localeCompare(b.name, 'es'),
-  'price-asc': (a, b) => a.price - b.price,
-  'price-desc': (a, b) => b.price - a.price,
+  'price-asc': (a, b) => (a.price ?? 0) - (b.price ?? 0),
+  'price-desc': (a, b) => (b.price ?? 0) - (a.price ?? 0),
 }
 
 const textButton =
@@ -38,7 +38,7 @@ export type GroupContext = {
   idPrefix: string
 }
 
-type Props<T extends TodayItem> = {
+type Props<T extends ListingItem> = {
   items: T[]
   groups: TodayFilterGroup<T>[]
   /** Groups drawn by the page: it gets the group and returns what to show in the filter column. */
@@ -51,9 +51,16 @@ type Props<T extends TodayItem> = {
    *  of the shop (REQ-WEB-CATALOG-004). */
   status?: 'ready' | 'loading' | 'error'
   onRetry?: () => void
+  /** How a piece is drawn. By default the shop card, with its price and "Agregar"; a page whose
+   *  pieces are not sold (the downloads) brings its own, and then the order bar is not drawn. */
+  renderCard?: (item: T, context: { index: number; compact: boolean }) => ReactNode
+  /** Sort options to offer (all by default). */
+  sortKeys?: TodaySort[]
+  /** What the pieces are called in the labels ("diseños" by default). */
+  noun?: Noun
 }
 
-export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = {}, searchText, cleanCards = false, status = 'ready', onRetry }: Props<T>) {
+export function ShopListing<T extends ListingItem>({ items, groups, renderGroup = {}, searchText, cleanCards = false, status = 'ready', onRetry, renderCard, sortKeys, noun = designNoun }: Props<T>) {
   const [selected, setSelected] = useState<TodaySelection>({})
   const [query, setQuery] = useState('')
   const [view, setView] = useState<TodayView>('compact')
@@ -88,9 +95,9 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
   const shown = matches.slice(0, limit)
   const remaining = matches.length - shown.length
   const compact = view === 'compact'
-  const orderCount = countItems(order)
+  const orderCount = renderCard ? 0 : countItems(order)
   const total = orderTotal(order)
-  const countText = matches.length === 1 ? '1 diseño' : `${matches.length} diseños`
+  const countText = matches.length === 1 ? `1 ${noun.one}` : `${matches.length} ${noun.many}`
 
   const ticked = groups.flatMap((group) =>
     (selected[group.key] ?? []).map((key) => ({
@@ -158,7 +165,7 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
     return (
       <div aria-busy="true">
         <p role="status" className="text-center text-base font-semibold">
-          Cargando los diseños…
+          Cargando los {noun.many}…
         </p>
         <ul aria-hidden="true" className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
           {Array.from({ length: 8 }, (_, index) => (
@@ -178,7 +185,7 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
       <div className="mx-auto max-w-xl">
         <StatusMessage
           kind="error"
-          title="No pudimos cargar los diseños"
+          title={`No pudimos cargar los ${noun.many}`}
           action={
             <div className="flex flex-wrap gap-3">
               <button type="button" onClick={onRetry ?? (() => window.location.reload())} className={textButton}>
@@ -202,7 +209,7 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
       <div className="mx-auto max-w-xl">
         <StatusMessage
           kind="empty"
-          title="Todavía no hay diseños"
+          title={`Todavía no hay ${noun.many}`}
           action={
             <a href={site.whatsappUrl} target="_blank" rel="noopener noreferrer" className={textButton}>
               Escribime por WhatsApp
@@ -210,7 +217,7 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
             </a>
           }
         >
-          Estoy preparando el catálogo. Si buscás algo en particular, escribime.
+          Estoy preparando esto. Si buscás algo en particular, escribime.
         </StatusMessage>
       </div>
     )
@@ -237,6 +244,8 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
 
         <div>
           <TodayToolbar
+            noun={noun}
+            sortKeys={sortKeys}
             query={query}
             onQuery={(value) => {
               setQuery(value)
@@ -294,13 +303,13 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
                   </button>
                 }
               >
-                Probá con otra palabra u otros filtros, o mirá todos los diseños.
+                Probá con otra palabra u otros filtros, o mirá todo.
               </StatusMessage>
             </div>
           ) : (
             <section id="resultados" tabIndex={-1} aria-labelledby="resultados-title" className="mt-6 scroll-mt-24 outline-none">
               <h2 id="resultados-title" className="sr-only">
-                Diseños
+                {noun.many.charAt(0).toUpperCase() + noun.many.slice(1)}
               </h2>
               <ul
                 ref={listRef}
@@ -313,7 +322,12 @@ export function ShopListing<T extends TodayItem>({ items, groups, renderGroup = 
               >
                 {shown.map((item, index) => (
                   <li key={item.slug}>
-                    <TodayCard item={item} index={index % PAGE_SIZE} compact={compact} clean={cleanCards} onAnnounce={setAnnouncement} />
+                    {/* Without a card of its own, the pieces are shop items. */}
+                    {renderCard ? (
+                      renderCard(item, { index: index % PAGE_SIZE, compact })
+                    ) : (
+                      <TodayCard item={item as unknown as TodayItem} index={index % PAGE_SIZE} compact={compact} clean={cleanCards} onAnnounce={setAnnouncement} />
+                    )}
                   </li>
                 ))}
               </ul>

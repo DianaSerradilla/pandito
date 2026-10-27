@@ -11,6 +11,8 @@ export function FeaturedCard({ item }: { item: FeaturedItem }) {
       className="block w-full focus-visible:outline focus-visible:outline-4 focus-visible:outline-amarillo focus-visible:outline-offset-4"
     >
       <SafeImage
+        loading="lazy"
+        decoding="async"
         src={item.image}
         alt=""
         draggable={false}

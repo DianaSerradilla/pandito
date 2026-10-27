@@ -7,6 +7,7 @@ export const paths = {
   product: '/catalogo/:slug',
   today: '/hoy',
   howToBuy: '/como-comprar',
+  downloads: '/descargas',
   cart: '/mi-pedido',
 } as const
 
@@ -18,5 +19,6 @@ export const navLabels = {
   today: 'HOY',
   todayFooter: 'Hoy', // footer only: not all caps
   howToBuy: 'Cómo comprar',
+  downloads: 'Descargas',
   cart: 'Mi pedido',
 } as const
