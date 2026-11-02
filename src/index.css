@@ -233,3 +233,9 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Catalog pictures cannot be dragged out of the page; free downloads are marked data-saveable. */
+img:not([data-saveable] img) {
+  -webkit-user-drag: none;
+  user-select: none;
+}

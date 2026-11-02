@@ -2,14 +2,16 @@ import { useState } from 'react'
 import { normalize } from '../../lib/text'
 import { FilterOption } from '../today/TodayFilterList'
 import type { GroupContext } from '../shop/ShopListing'
-import { catalogFamilies, catalogTopics, type CatalogTopic } from '../../data/publicCatalog'
+import { useCatalog, type CatalogTopic } from '../../data/publicCatalog'
 
 // The Catalog's "Tema" filter. There can be dozens of topics, too many for a plain list, so it
 // works in three steps: a search box, the few popular topics (plus any you already ticked, so a
 // choice never hides), and "Ver todos los temas", which opens them grouped by family. Typing shows
 // every topic that matches, from any family. Everything is a real checkbox with a 44 px target.
-// The topics and families are PLACEHOLDERS (see catalogItems.ts).
+// The topics and families come from Supabase when it is connected, and are PLACEHOLDERS otherwise
+// (see catalogItems.ts).
 export function CatalogTopicFilter({ selected, countFor, onToggle, idPrefix }: GroupContext) {
+  const { topics: catalogTopics, families: catalogFamilies } = useCatalog()
   const [text, setText] = useState('')
   const [showAll, setShowAll] = useState(false)
   const q = normalize(text)
@@ -32,7 +34,7 @@ export function CatalogTopicFilter({ selected, countFor, onToggle, idPrefix }: G
 
   return (
     <div className="border-t-[1.5px] border-tinta/20 py-4">
-      <h3 className="font-display text-lg uppercase tracking-wide">Tema</h3>
+      <h2 className="font-display text-lg uppercase tracking-wide">Tema</h2>
 
       <label className="relative mt-2 block">
         <span className="sr-only">Buscar un tema</span>

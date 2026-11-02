@@ -158,7 +158,6 @@ export function Preloader() {
         </defs>
         <rect width={W} height={H} className="fill-naranja" mask={`url(#${MASK_ID})`} />
       </svg>
-      <span className="sr-only">Cargando</span>
     </div>,
     document.body,
   )

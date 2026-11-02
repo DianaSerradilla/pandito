@@ -11,7 +11,8 @@ import type { TodayItem } from '../today/todayItems'
 // approximate (it assumes the 16-inch laptop of the photo). Real photos per material replace them.
 type Props = {
   item: TodayItem
-  material: { key: string; label: string }
+  material: { key: string; label: string; effect?: string }
+  /** `label` is the length in words ("7,5 cm"); `cm` draws the ruler and the notebook. */
   size: { label: string; cm: number }
 }
 
@@ -105,9 +106,9 @@ export function ProductGallery({ item, material, size }: Props) {
   const [index, setIndex] = useState(0)
 
   const slides = [
-    { key: 'vista', label: 'El sticker', alt: `${item.name}, ${material.label}, ${size.cm} cm.` },
-    { key: 'escala', label: 'Tamaño real', alt: `${item.name} mide ${size.cm} cm, junto a una regla de ${RULER_CM} cm.` },
-    { key: 'uso', label: 'En una notebook', alt: `${item.name} de ${size.cm} cm pegado en una notebook.` },
+    { key: 'vista', label: 'El sticker', alt: `${item.name}, ${material.label}, ${size.label}.` },
+    { key: 'escala', label: 'Tamaño real', alt: `${item.name} mide ${size.label}, junto a una regla de ${RULER_CM} cm.` },
+    { key: 'uso', label: 'En una notebook', alt: `${item.name} de ${size.label} pegado en una notebook.` },
   ]
   const current = slides[index]
   const go = (next: number) => setIndex((next + slides.length) % slides.length)
@@ -132,19 +133,19 @@ export function ProductGallery({ item, material, size }: Props) {
         {/* The picture. Its own box, so the buttons below are not hidden inside an image role. */}
         <div role="img" aria-label={current.alt} className="absolute inset-0">
           {current.key === 'vista' && (
-            <StickerArt item={item} material={material.key} className="absolute left-1/2 top-[46%] size-[68%] -translate-x-1/2 -translate-y-1/2" />
+            <StickerArt item={item} material={material.effect ?? material.key} className="absolute left-1/2 top-[46%] size-[68%] -translate-x-1/2 -translate-y-1/2" />
           )}
 
           {current.key === 'escala' && (
             <>
               <StickerArt
                 item={item}
-                material={material.key}
+                material={material.effect ?? material.key}
                 className="absolute bottom-[19%] left-[6%] aspect-square"
                 style={{ width: `${(size.cm / RULER_CM) * 88}%`, marginBottom: '0.15rem' }}
               />
               <Ruler />
-              <p className="absolute left-[6%] top-[6%] font-display text-4xl uppercase leading-none md:text-5xl">{size.cm} cm</p>
+              <p className="absolute left-[6%] top-[6%] font-display text-4xl uppercase leading-none md:text-5xl">{size.label}</p>
             </>
           )}
 
@@ -161,7 +162,7 @@ export function ProductGallery({ item, material, size }: Props) {
               />
               <StickerArt
                 item={item}
-                material={material.key}
+                material={material.effect ?? material.key}
                 className="absolute aspect-square drop-shadow-[0_2px_3px_rgb(0_0_0/0.45)]"
                 style={{ left: '50%', top: '48%', width: `${size.cm * LAPTOP_PX_PER_CM}%`, transform: 'translate(-50%, -50%) rotate(-6deg)' }}
               />

@@ -48,6 +48,17 @@ export function TodayToolbar({ sortKeys, noun = designNoun, query, onQuery, sort
     if (!open && dialog.open) dialog.close()
   }, [open])
 
+  // The sheet is hidden from 1024 px up (the filters move to a column): close it if the screen grows
+  // while it is open, or the rest of the page would stay blocked behind an invisible modal.
+  useEffect(() => {
+    const wide = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => {
+      if (wide.matches) setOpen(false)
+    }
+    wide.addEventListener('change', onChange)
+    return () => wide.removeEventListener('change', onChange)
+  }, [])
+
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
       <div role="search" className="min-w-0 basis-full md:basis-auto md:flex-1 md:max-w-sm">

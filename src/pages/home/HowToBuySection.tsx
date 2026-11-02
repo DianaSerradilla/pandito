@@ -335,11 +335,7 @@ export function HowToBuySection({ headingAs = 'h2' }: { headingAs?: 'h1' | 'h2' 
           </ol>
 
           <div className="mt-10 flex justify-center md:mt-12 [@media(min-width:768px)_and_(max-height:860px)]:mt-3">
-            <ArrowAnchor
-              href={site.whatsappUrl}
-              mark
-              aria-label="Empezar mi pedido por WhatsApp (se abre en una pestaña nueva)"
-            >
+            <ArrowAnchor href={site.whatsappUrl} mark>
               Empezar mi pedido
             </ArrowAnchor>
           </div>

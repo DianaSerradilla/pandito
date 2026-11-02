@@ -10,10 +10,10 @@ import { Script } from '../components/ui/Script'
 import { StatusMessage } from '../components/ui/StatusMessage'
 import { useOrderItems } from '../lib/orderStore'
 import { useCatalogStatus } from '../data/useCatalogStatus'
-import { availabilityOf, catalogTopics, lineKey, materials, sizes, stickerUses, variantPrice, type Availability } from '../data/publicCatalog'
+import { isConnected, materials, sizes, stickerUses, useCatalog, type Availability } from '../data/publicCatalog'
 import { ProductGallery } from './product/ProductGallery'
-import { promoGroupOf } from './product/promos'
-import { findProduct, recommended, type Product } from './product/productData'
+import { packOffersFor } from './product/promos'
+import { findProduct, productChoices, productImage, recommended, type Choice, type Product } from './product/productData'
 import { OrderControl } from './shop/OrderControl'
 import { TodayCard } from './today/TodayCard'
 import { formatPrice } from './today/todayItems'
@@ -21,11 +21,12 @@ import { pageTitle } from '../config/pageMeta'
 import { usePageMeta } from '../lib/pageMeta'
 
 // Product page (REQ-WEB-PRODUCT-*), PROTOTYPE. The piece on its colored tile, its options (material
-// and size, both PLACEHOLDERS), the price that follows them, "Agregar" to the order and, for a
-// whole sheet of the same sticker, a request through WhatsApp: that one is not bought, the team
-// answers with the price. Below, "Te pueden gustar". The options are radio groups (arrow keys,
-// real labels), the price and every change to the order are announced, and nothing here moves.
-// SAMPLE DATA and PROVISIONAL COPY.
+// and size), the price that follows them, "Agregar" to the order and, for a whole sheet of the
+// same sticker, a request through WhatsApp: that one is not bought, the team answers with the
+// price. Below, "Te pueden gustar". The options are radio groups (arrow keys, real labels), the
+// price and every change to the order are announced, and nothing here moves. Connected, the options
+// are the combinations the piece really comes in (a size that does not exist in a material is not
+// offered) and the price is the variant's; without Supabase they are SAMPLE DATA. PROVISIONAL COPY.
 const radioCard =
   'flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-ui border-[1.5px] border-tinta bg-crema px-3.5 py-2 text-base font-semibold transition-colors duration-150 hover:bg-tinta/5 peer-checked:bg-tinta peer-checked:text-crema peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-azul'
 
@@ -36,8 +37,6 @@ const availabilityCopy: Record<Availability, { label: string; text: string }> = 
   unavailable: { label: 'No disponible por ahora', text: 'No lo tengo con estas opciones. Probá con otro tamaño o material, o escribime.' },
 }
 
-type Option = { key: string; label: string; hint: string }
-
 function OptionGroup({
   legend,
   name,
@@ -47,7 +46,7 @@ function OptionGroup({
 }: {
   legend: string
   name: string
-  options: Option[]
+  options: Choice[]
   value: string
   onChange: (key: string) => void
 }) {
@@ -68,7 +67,7 @@ function OptionGroup({
             />
             <label htmlFor={`${name}-${option.key}`} className={`${radioCard} h-full flex-col items-start justify-center gap-0.5`}>
               <span>{option.label}</span>
-              <span className="text-sm font-medium opacity-80">{option.hint}</span>
+              {option.hint && <span className="text-sm font-medium opacity-80">{option.hint}</span>}
             </label>
           </div>
         ))}
@@ -79,24 +78,35 @@ function OptionGroup({
 
 function ProductView({ product }: { product: Product }) {
   const { item, topics } = product
-  const [material, setMaterial] = useState(materials[0].key)
-  const [size, setSize] = useState(sizes[0].key)
+  const catalog = useCatalog()
+  // The options the piece really comes in; none for a piece without them (the HOY pieces).
+  const choices = productChoices(item.slug)
+  const [material, setMaterial] = useState(choices?.initial.materialKey ?? '')
+  const [size, setSize] = useState(choices?.initial.sizeKey ?? '')
   const [announcement, setAnnouncement] = useState('')
   const order = useOrderItems()
 
-  const variants = item.hasVariants === true
-  const materialPick = materials.find((entry) => entry.key === material) ?? materials[0]
-  const sizePick = sizes.find((entry) => entry.key === size) ?? sizes[0]
+  // The groups are drawn only when there is something to choose; the variant still decides the line.
+  const variants = item.hasVariants === true && choices !== undefined
+  const picked = choices?.find(material, size) ?? choices?.initial
+  const materialPick = { key: picked?.materialKey ?? materials[0].key, label: picked?.materialLabel ?? materials[0].label, effect: picked?.effect }
+  const sizePick = picked ? { label: picked.sizeLabel, cm: picked.cm } : { label: `${sizes[0].cm} cm`, cm: sizes[0].cm }
   const materialLabel = materialPick.label
-  const sizeLabel = `${sizePick.cm} cm`
-  const price = variants ? variantPrice(material, size) : item.price
-  const line = variants ? lineKey(item.slug, material, size) : item.slug
-  const lineName = variants ? `${item.name}, ${materialLabel}, ${sizeLabel}` : item.name
-  const availability: Availability = variants ? availabilityOf(item.slug, material, size) : 'confirm'
+  const sizeLabel = sizePick.label
+  const price = picked ? picked.price : item.price
+  const line = picked ? picked.line : item.slug
+  const lineName = picked ? `${item.name}, ${materialLabel}, ${sizeLabel}` : item.name
+  const availability: Availability = picked ? picked.availability : 'confirm'
   const inOrder = order[line] ?? 0
-  const topicLabels = topics.map((key) => catalogTopics.find((topic) => topic.key === key)?.label).filter(Boolean)
+  const topicLabels = topics.map((key) => catalog.topics.find((topic) => topic.key === key)?.label).filter(Boolean)
+  // A material that does not come in the size chosen takes the first size it does come in.
+  const pickMaterial = (key: string) => {
+    setMaterial(key)
+    const available = choices?.sizesFor(key) ?? []
+    if (available.length > 0 && !available.some((option) => option.key === size)) setSize(available[0].key)
+  }
   const related = recommended(product)
-  const packGroup = promoGroupOf(size)
+  const packOffers = packOffersFor(item.slug, material, size)
   const description = item.description ?? (topicLabels.length > 0 ? `Sticker de ${topicLabels.join(', ')}.` : undefined)
   const uses = item.uses ?? stickerUses
   usePageMeta({
@@ -130,7 +140,7 @@ function ProductView({ product }: { product: Product }) {
 
       <div className="mt-2 grid gap-8 md:grid-cols-2 md:items-start md:gap-12 lg:gap-16">
         <div className="md:sticky md:top-[6.25rem]">
-          <ProductGallery item={item} material={materialPick} size={sizePick} />
+          <ProductGallery item={{ ...item, image: productImage(item) }} material={materialPick} size={sizePick} />
         </div>
 
         <div>
@@ -155,7 +165,7 @@ function ProductView({ product }: { product: Product }) {
             <span className="sr-only">Precio: </span>
             {formatPrice(price)}
           </p>
-          <p className="mt-1 text-sm text-tinta/75">Precio de muestra, a confirmar. Cada unidad.</p>
+          <p className="mt-1 text-sm text-tinta/75">{isConnected ? 'Precio a confirmar. Cada unidad.' : 'Precio de muestra, a confirmar. Cada unidad.'}</p>
 
           <p aria-live="polite" className="mt-4 text-base">
             <span className="inline-flex items-center gap-2 rounded-ui border-[1.5px] border-tinta px-3 py-1 font-semibold">
@@ -165,37 +175,21 @@ function ProductView({ product }: { product: Product }) {
             <span className="mt-2 block max-w-md text-pretty text-tinta/85">{availabilityCopy[availability].text}</span>
           </p>
 
-          {variants && (
+          {variants && choices && (
             <>
-              <OptionGroup
-                legend="Material"
-                name="material"
-                value={material}
-                onChange={setMaterial}
-                options={materials.map(({ key, label, note }) => ({ key, label, hint: note }))}
-              />
-              <OptionGroup
-                legend="Tamaño (lado mayor)"
-                name="tamano"
-                value={size}
-                onChange={setSize}
-                options={sizes.map(({ key, label, cm, price: sizePrice }) => ({ key, label: `${cm} cm`, hint: `${label} · ${formatPrice(sizePrice)}` }))}
-              />
-              {packGroup && (
+              <OptionGroup legend="Material" name="material" value={material} onChange={pickMaterial} options={choices.materials} />
+              <OptionGroup legend="Tamaño (lado mayor)" name="tamano" value={size} onChange={setSize} options={choices.sizesFor(material)} />
+              {packOffers && (
                 <section aria-labelledby="packs-title" className="mt-6 rounded-ui border-[1.5px] border-tinta bg-amarillo/40 p-4">
                   <h2 id="packs-title" className="font-display text-xl uppercase leading-none">
-                    Packs de {packGroup.label}
+                    {packOffers.heading}
                   </h2>
                   <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-base font-semibold tabular-nums">
-                    {packGroup.packs.map((pack) => (
-                      <li key={pack.quantity}>
-                        {pack.quantity} por {formatPrice(pack.price)}
-                      </li>
+                    {packOffers.items.map((offer) => (
+                      <li key={offer.key}>{offer.text}</li>
                     ))}
                   </ul>
-                  <p className="mt-2 text-sm text-tinta/80">
-                    Con cualquier diseño. Se aplican solos en Mi pedido. Precios de muestra, a confirmar.
-                  </p>
+                  <p className="mt-2 text-sm text-tinta/80">{packOffers.note}</p>
                 </section>
               )}
             </>

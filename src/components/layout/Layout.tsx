@@ -23,13 +23,13 @@ export function Layout() {
     <div className="flex min-h-screen flex-col">
       <a
         href="#contenido"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:rounded-ui focus:bg-crema focus:px-4 focus:py-2"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-ui focus:bg-crema focus:px-4 focus:py-2"
       >
         Saltar al contenido
       </a>
       <RouteMeta />
       <Header />
-      <main id="contenido" className="flex-1">
+      <main id="contenido" tabIndex={-1} className="flex-1 outline-none">
         <Container className="py-10">
           <Outlet />
         </Container>

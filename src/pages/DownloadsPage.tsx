@@ -2,15 +2,15 @@ import { useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router'
 import { Heading } from '../components/ui/Heading'
 import { Script } from '../components/ui/Script'
-import { downloadFilterGroups, downloadItems } from '../data/publicCatalog'
-import { useCatalogStatus } from '../data/useCatalogStatus'
+import { useDownloads } from '../data/useDownloads'
 import { DownloadCard } from './downloads/DownloadCard'
 import { ShopListing } from './shop/ShopListing'
 
 // Free downloads (REQ-WEB-DOWNLOAD-001): wallpapers for phone and computer, WhatsApp stickers and
 // whatever else the team approves later. It is the same listing as the Catalog (search, filters,
 // grid) with its own card: a preview, format, resolution and a direct download, no price and no
-// order. SAMPLE DATA and PROVISIONAL COPY: the final files and the terms of use are pending.
+// order. Connected to Supabase the resources come from public_downloads (loading, failed and empty
+// states included, see data/useDownloads.ts); without it they are SAMPLE DATA. PROVISIONAL COPY.
 const noun = { one: 'recurso', many: 'recursos' }
 
 // DOWNLOAD-002. A stable link for a campaign or a DM: /descargas?recurso=<slug> opens the library with
@@ -21,9 +21,9 @@ const noun = { one: 'recurso', many: 'recursos' }
 const downloadParam = 'recurso'
 
 export function DownloadsPage() {
-  const { status, retry } = useCatalogStatus()
+  const { status, items, groups, retry } = useDownloads()
   const [params] = useSearchParams()
-  const linked = status === 'ready' ? downloadItems.find((item) => item.slug === params.get(downloadParam)) : undefined
+  const linked = status === 'ready' ? items.find((item) => item.slug === params.get(downloadParam)) : undefined
   const linkedRef = useRef<HTMLElement>(null)
   useEffect(() => {
     linkedRef.current?.focus()
@@ -53,10 +53,10 @@ export function DownloadsPage() {
 
       <div className="mt-10 lg:mt-14">
         <ShopListing
-          items={status === 'empty' ? [] : downloadItems}
+          items={status === 'empty' ? [] : items}
           status={status === 'loading' || status === 'error' ? status : 'ready'}
           onRetry={retry}
-          groups={downloadFilterGroups}
+          groups={groups}
           noun={noun}
           sortKeys={['featured', 'name']}
           renderCard={(item, { index, compact }) => <DownloadCard item={item} index={index} compact={compact} />}

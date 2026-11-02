@@ -7,7 +7,7 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { FeaturedCard } from './FeaturedCard'
 import { FeaturedStack } from './FeaturedStack'
 import { ScrollSticker } from './ScrollSticker'
-import { featuredItems } from '../../data/publicCatalog'
+import { isConnected, useFeaturedItems } from '../../data/publicCatalog'
 
 // There is no "most requested" list yet (it will come from real sales), so this goes to the whole catalog.
 const allFeaturedHref = paths.catalog
@@ -39,6 +39,11 @@ function AllFeaturedButton() {
 
 export function FeaturedSection() {
   const reduce = usePrefersReducedMotion()
+  const featuredItems = useFeaturedItems()
+
+  // Connected, no featured pieces (still loading, none chosen, or the read failed) means no section:
+  // an empty "most requested" block would promise something that is not there.
+  if (isConnected && featuredItems.length === 0) return null
 
   return (
     <div className="surface-dark relative left-1/2 w-screen -translate-x-1/2 bg-tinta text-crema">
@@ -80,6 +85,7 @@ export function FeaturedSection() {
         </section>
       ) : (
         <FeaturedStack
+          items={featuredItems}
           intro={
             <div>
               <Intro desktopLeft />

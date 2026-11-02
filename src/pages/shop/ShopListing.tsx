@@ -6,6 +6,7 @@ import { StatusMessage } from '../../components/ui/StatusMessage'
 import { stickerBase, stickerSize, stickerTone } from '../../components/ui/sticker'
 import { normalize } from '../../lib/text'
 import { countItems, useOrderItems } from '../../lib/orderStore'
+import { isConnected, useCatalog } from '../../data/publicCatalog'
 import { orderTotal } from '../product/productData'
 import { TodayCard } from '../today/TodayCard'
 import { TodayFilterList, type TodaySelection } from '../today/TodayFilterList'
@@ -70,6 +71,8 @@ export function ShopListing<T extends ListingItem>({ items, groups, renderGroup 
   const listRef = useRef<HTMLUListElement>(null)
   const focusFrom = useRef<number | null>(null)
   const order = useOrderItems()
+  // The order's total is priced from the catalog: draw again when it finishes loading.
+  useCatalog()
 
   const q = normalize(query)
 
@@ -360,7 +363,7 @@ export function ShopListing<T extends ListingItem>({ items, groups, renderGroup 
             <p className="text-base font-semibold">
               {orderCount === 1 ? '1 producto' : `${orderCount} productos`}
               <span className="font-medium text-tinta/75"> · {formatPrice(total)}</span>
-              <span className="sr-only"> (precios de muestra, a confirmar)</span>
+              <span className="sr-only">{isConnected ? ' (precios a confirmar)' : ' (precios de muestra, a confirmar)'}</span>
             </p>
             <ArrowLink to={cartNav.to} mark className="min-h-11">
               Ver mi pedido

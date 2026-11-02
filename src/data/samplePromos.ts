@@ -4,7 +4,9 @@
 // 4 = 3500, 6 = 5500; medium single = 1250 (between the two; its own packs are pending). These
 // stand in for the promotions table (Supabase), which the internal panel will own.
 export type Pack = { quantity: number; price: number }
-export type PromoGroup = { key: string; label: string; sizeKeys: string[]; packs: Pack[] }
+/** `named`: a promotion of the database. Its `label` is the promotion's own name (shown as is), not
+ *  the kind of stickers a pack of the sample is made of. */
+export type PromoGroup = { key: string; label: string; sizeKeys: string[]; packs: Pack[]; named?: boolean }
 
 export const promoGroups: PromoGroup[] = [
   {

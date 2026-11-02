@@ -34,11 +34,7 @@ export function ClosingSection() {
             Contame qué tenés en mente y lo diseño yo.
           </p>
           <div className="mt-10">
-            <ArrowAnchor
-              href={site.whatsappUrl}
-              mark
-              aria-label="Pedí tu diseño personalizado por WhatsApp (se abre en una pestaña nueva)"
-            >
+            <ArrowAnchor href={site.whatsappUrl} mark>
               Pedí el tuyo
             </ArrowAnchor>
           </div>

@@ -15,19 +15,21 @@ Estado: **REQ-WEB-BASE-001, pendiente de aprobación del equipo.** Todavía no h
 npm install
 ```
 
-Creá un archivo `.env` en la raíz con estas variables (nunca lo subas a git):
+Copiá `.env.example` a `.env` en la raíz y completá los valores (nunca lo subas a git). Para el servidor sumá además:
 
 ```
 # Públicas (llegan al navegador). Solo la clave anon; el acceso lo limitan las políticas RLS.
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
+# Opcional: dominio final sin barra al final (sitemap)
+VITE_SITE_URL=
 
 # Solo servidor (nunca con prefijo VITE_)
 SUPABASE_SERVICE_ROLE_KEY=
 PORT=3001
 ```
 
-La web arranca aunque falten las variables de Supabase; el cliente simplemente queda deshabilitado.
+La web arranca aunque falten las variables de Supabase: sin ellas usa el catálogo de ejemplo y no se pide nada a la base. Con las dos variables `VITE_SUPABASE_*` el catálogo, la ficha, los precios del pedido, las franjas de entrega y las promos de packs se leen de las vistas públicas, y "Pedir" guarda el pedido (`submit_web_request`) antes de abrir WhatsApp. HOY (evento activo y sus piezas, que son piezas del catálogo y se piden igual) y Descargas se leen al abrir su página. Las promos (básicas y especiales) las aplica la web, no el servidor: el total es una estimación "a confirmar" y el mensaje de WhatsApp lista las promos aplicadas (reglas en `src/data/promotions.ts`). Sigue siendo de ejemplo solo lo que no está cargado en la base (p. ej. Destacados vacíos).
 
 ## Comandos
 
@@ -53,7 +55,7 @@ Comprobación rápida del servidor: `http://localhost:3001/api/health` devuelve 
 src/components/ui/       componentes base (Button, Heading, Script, Tag, Container, StatusMessage)
 src/components/layout/   header, footer y layout compartido
 src/pages/               una página por ruta (placeholders hasta cada REQ)
-src/data/                datos públicos del sitio (publicCatalog.ts es la única puerta; hoy lee de ejemplos, luego Supabase)
+src/data/                datos públicos del sitio (publicCatalog.ts es la única puerta; lee de Supabase si hay variables y, si no, de ejemplos)
 src/pages/today/         HOY: tarjetas, filtros y datos de ejemplo (todayItems.ts)
 src/pages/shop/          Listado de tienda compartido por HOY y Catálogo (buscar, ordenar, filtrar, pedido)
 src/pages/catalog/       Catálogo: datos de ejemplo y filtro de temas (búsqueda + familias)

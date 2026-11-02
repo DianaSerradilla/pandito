@@ -1,31 +1,55 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { Link } from 'react-router'
 import { paths } from '../paths'
 import { site } from '../config/site'
 import { ArrowAnchor } from '../components/ui/ArrowLink'
-import { ButtonLink } from '../components/ui/Button'
+import { Button, ButtonLink } from '../components/ui/Button'
 import { Heading } from '../components/ui/Heading'
 import { Script } from '../components/ui/Script'
 import { StatusMessage } from '../components/ui/StatusMessage'
 import { clearOrder, setQuantity, useOrderItems } from '../lib/orderStore'
+import { submitOrder } from '../lib/submitOrder'
+import { isConnected, reloadCatalog, useCatalog } from '../data/publicCatalog'
 import { useDeliverySlots } from '../data/useDeliverySlots'
 import { lineInfo, orderPricing } from './product/productData'
+import { hintLabel, packLabel } from './product/promos'
 import { OrderControl } from './shop/OrderControl'
 import { tones } from './today/tones'
 import { formatPrice } from './today/todayItems'
 
-// My order (REQ-WEB-CART-*), PROTOTYPE. Nothing is paid or sent from the site: the order is
-// closed on WhatsApp, so this page only gathers what was chosen, lets it be adjusted and builds
-// the message ("Pedir" opens WhatsApp with it written, the team answers there with the final price
-// and the delivery). The order lives in this browser (lib/orderStore). The number is the footer's
-// until REQ-WEB-CART-005 confirms the one for orders; prices are SAMPLES, so the message says the
-// total is an estimate. The name is required (it is who the team answers to), the notes are optional; neither is saved,
-// they only go in the message.
+// My order (REQ-WEB-CART-*), PROTOTYPE. Nothing is paid from the site: the order is closed on
+// WhatsApp, so this page gathers what was chosen, lets it be adjusted and builds the message
+// ("Pedir" opens WhatsApp with it written, the team answers there with the final price and the
+// delivery). The order lives in this browser (lib/orderStore). The number is the footer's until
+// REQ-WEB-CART-005 confirms the one for orders. The name is required (it is who the team answers
+// to), the notes are optional.
+//
+// Connected to Supabase, "Pedir" also saves the request (lib/submitOrder) and the message starts
+// with its code ("R-014"), so the team can find it. The WhatsApp window is opened blank, at the
+// click, so the browser does not block it while the request is saved; if saving fails the message
+// goes out without a code and the visitor is told, calmly: the sale is never blocked. The same
+// content is saved once: tapping Pedir again reuses the code. Prices are the variants' prices, an
+// estimate the team confirms: the server stores list prices and does not apply promotions, so the
+// packs (data/promotions.ts) are applied here and listed in the message. Without Supabase the prices
+// and packs are SAMPLES.
 const field =
   'mt-1.5 min-h-11 w-full rounded-ui border-[1.5px] border-tinta bg-crema px-3 py-2 text-base placeholder:text-tinta/70'
 
 // Very long wa.me links get cut by some phones, so the cart warns before that happens.
 const tooLongUrl = 1800
+
+const upperFirst = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** Takes the window opened at the click to WhatsApp, or opens one if there is none (or it was
+ *  closed). A browser may still block the latter; the cart then says to tap Pedir again. */
+function openWhatsApp(target: Window | null, url: string) {
+  if (target && !target.closed) {
+    target.location.href = url
+    return
+  }
+  const opened = window.open(url, '_blank')
+  if (opened) opened.opener = null
+}
 
 export function CartPage() {
   const order = useOrderItems()
@@ -37,16 +61,23 @@ export function CartPage() {
   const [slotId, setSlotId] = useState('')
   const [opened, setOpened] = useState(false)
   const nameRef = useRef<HTMLInputElement>(null)
+  const catalog = useCatalog()
+  // What was saved, and for which content: the same content is not saved twice.
+  const [saved, setSaved] = useState<{ signature: string; code?: string } | null>(null)
+  const [saveNote, setSaveNote] = useState('')
+  const saving = useRef(false)
 
   const lines = Object.entries(order).flatMap(([key, quantity]) => {
     const info = lineInfo(key)
     return info ? [{ key, quantity, ...info }] : []
   })
 
-  // A line whose piece no longer exists (an old order, a removed piece) is dropped.
+  // A line whose piece no longer exists (an old order, a removed piece) is dropped. Only once the
+  // catalog is known: while it loads, or if it failed, no line can be told apart from a removed one.
   useEffect(() => {
+    if (catalog.status !== 'ready') return
     for (const key of Object.keys(order)) if (!lineInfo(key)) setQuantity(key, 0)
-  }, [order])
+  }, [order, catalog.status])
 
   const slot = slots.find((entry) => entry.id === slotId)
   const nameMissing = name.trim() === ''
@@ -55,12 +86,15 @@ export function CartPage() {
   const pieces = lines.reduce((sum, line) => sum + line.quantity, 0)
   const label = (line: (typeof lines)[number]) => (line.options ? `${line.item.name}, ${line.options}` : line.item.name)
 
-  const message = [
-    'Hola! Quiero hacer este pedido:',
+  const signature = JSON.stringify([name.trim(), slot?.id ?? '', notes.trim(), lines.map((line) => [line.key, line.quantity])])
+  const savedCode = saved?.signature === signature ? saved.code : undefined
+
+  const buildMessage = (code?: string) => [
+    code ? `Hola! Quiero hacer este pedido (${code}):` : 'Hola! Quiero hacer este pedido:',
     '',
     ...lines.map((line) => `• ${line.quantity} × ${label(line)} (${formatPrice(line.price * line.quantity)})`),
     ...(pricing.applied.length > 0
-      ? ['', ...pricing.applied.map(({ group, pack, times }) => `Promo: ${times > 1 ? `${times} × ` : ''}pack de ${pack.quantity} ${group.label} (${formatPrice(pack.price)})`), `Descuento por packs: -${formatPrice(pricing.discount)}`]
+      ? ['', ...pricing.applied.map(({ group, pack, times }) => `Promo: ${times > 1 ? `${times} × ` : ''}${packLabel(group, pack)} (${formatPrice(pack.price)})`), `Descuento por packs: -${formatPrice(pricing.discount)}`]
       : []),
     '',
     `Total estimado: ${formatPrice(total)} (a confirmar)`,
@@ -73,7 +107,91 @@ export function CartPage() {
     .filter((row, index, all) => row !== '' || (index > 0 && all[index - 1] !== ''))
     .join('\n')
     .trim()
-  const whatsappUrl = `${site.whatsappUrl}?text=${encodeURIComponent(message)}`
+  const urlFor = (code?: string) => `${site.whatsappUrl}?text=${encodeURIComponent(buildMessage(code))}`
+  const whatsappUrl = urlFor(savedCode)
+
+  // "Pedir" with Supabase connected: save the request, then take the opened window to WhatsApp.
+  const placeOrder = async (event: MouseEvent<HTMLAnchorElement>) => {
+    if (nameMissing) {
+      event.preventDefault()
+      setTriedWithoutName(true)
+      nameRef.current?.focus()
+      return
+    }
+    setOpened(true)
+    if (!isConnected) return // the link itself opens WhatsApp
+    event.preventDefault()
+    if (saving.current) return
+
+    // Same content as the request already saved: no second order, just WhatsApp again.
+    if (saved?.signature === signature) {
+      openWhatsApp(null, urlFor(saved.code))
+      return
+    }
+    // A line without a variant id (the database lacks migration 0016) cannot be saved, but it can be sent.
+    if (lines.some((line) => !line.variantId)) {
+      setSaveNote('Este pedido tiene productos que todavía no podemos guardar, pero igual podés mandarlo por WhatsApp.')
+      openWhatsApp(null, urlFor())
+      return
+    }
+
+    // Opened now, while the click still counts, and sent to WhatsApp once the request is saved.
+    const target = window.open('', '_blank')
+    if (target) target.opener = null
+    saving.current = true
+    setSaveNote('Guardando tu pedido…')
+    const result = await submitOrder({
+      name: name.trim(),
+      lines: lines.flatMap((line) => (line.variantId ? [{ variantId: line.variantId, quantity: line.quantity }] : [])),
+      slotId: slot?.id ?? null,
+      note: notes.trim(),
+    })
+    saving.current = false
+    if (result.ok) {
+      setSaved({ signature, code: result.code })
+      setSaveNote(result.code ? `Guardamos tu pedido (${result.code}). Se abre WhatsApp para confirmarlo.` : 'Guardamos tu pedido. Se abre WhatsApp para confirmarlo.')
+      openWhatsApp(target, urlFor(result.code))
+    } else {
+      setSaveNote(result.message)
+      openWhatsApp(target, urlFor())
+    }
+  }
+
+  // A connected cart cannot price anything until the catalog is known (the order stays saved).
+  if (catalog.status === 'loading') {
+    return (
+      <div aria-busy="true" className="mx-auto max-w-xl py-10 md:py-20">
+        <h1 className="sr-only">Mi pedido</h1>
+        <p role="status" className="text-center text-base font-semibold">
+          Cargando tu pedido…
+        </p>
+      </div>
+    )
+  }
+
+  if (catalog.status === 'error') {
+    return (
+      <div className="mx-auto max-w-xl py-10 md:py-20">
+        <h1 className="sr-only">Mi pedido</h1>
+        <StatusMessage
+          kind="error"
+          title="No pudimos cargar tu pedido"
+          action={
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={reloadCatalog} variant="secondary">
+                Probar de nuevo
+              </Button>
+              <ButtonLink to={paths.catalog} variant="secondary">
+                Ver el catálogo
+              </ButtonLink>
+            </div>
+          }
+        >
+          Tu pedido sigue guardado. Probá de nuevo en un rato. Si es urgente, escribime por WhatsApp.
+        </StatusMessage>
+      </div>
+    )
+  }
 
   if (lines.length === 0) {
     return (
@@ -120,7 +238,8 @@ export function CartPage() {
               <li key={line.key} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-4 gap-y-3 border-b-[1.5px] border-tinta/20 py-5 sm:grid-cols-[7rem_minmax(0,1fr)_auto] sm:items-center">
                 <Link
                   to={`/catalogo/${line.item.slug}`}
-                  aria-label={`Ver ${line.item.name}`}
+                  aria-hidden="true"
+                  tabIndex={-1}
                   className={`grid aspect-square place-items-center overflow-hidden rounded-[0.25rem] border-[1.5px] border-tinta ${tones[line.item.tone]}`}
                 >
                   <img
@@ -197,8 +316,9 @@ export function CartPage() {
           {pricing.applied.length > 0 && (
             <ul className="mt-3 space-y-1 text-sm font-semibold">
               {pricing.applied.map(({ group, pack, times }) => (
-                <li key={`${group.key}-${pack.quantity}`}>
-                  {times > 1 ? `${times} × ` : ''}Pack de {pack.quantity} {group.label}: {formatPrice(pack.price)}
+                <li key={`${group.key}-${pack.quantity}-${pack.price}`}>
+                  {times > 1 ? `${times} × ` : ''}
+                  {upperFirst(packLabel(group, pack))}: {formatPrice(pack.price)}
                 </li>
               ))}
               <li className="text-tinta/80">
@@ -209,13 +329,13 @@ export function CartPage() {
           {pricing.hints.length > 0 && (
             <ul className="mt-3 space-y-1 text-sm text-tinta/85">
               {pricing.hints.map(({ group, missing }) => (
-                <li key={group.key}>
-                  Sumá {missing} más de {group.label} y completás un pack.
-                </li>
+                <li key={group.key}>{hintLabel(group, missing)}</li>
               ))}
             </ul>
           )}
-          <p className="mt-1 text-sm text-tinta/75">Precio de muestra, a confirmar. La entrega se arregla por WhatsApp.</p>
+          <p className="mt-1 text-sm text-tinta/75">
+            {isConnected ? 'Total estimado, a confirmar. ' : 'Precio de muestra, a confirmar. '}La entrega se arregla por WhatsApp.
+          </p>
 
           <label className="mt-5 block text-sm font-semibold">
             Tu nombre
@@ -292,19 +412,20 @@ export function CartPage() {
               href={whatsappUrl}
               mark
               onClick={(event) => {
-                if (!nameMissing) {
-                  setOpened(true)
-                  return
-                }
-                event.preventDefault()
-                setTriedWithoutName(true)
-                nameRef.current?.focus()
+                void placeOrder(event)
               }}
             >
               Pedir
             </ArrowAnchor>
           </div>
-          <p className="mt-3 text-sm text-tinta/75">Se abre WhatsApp con tu pedido escrito. No se paga acá.</p>
+          <p className="mt-3 text-sm text-tinta/75">
+            {isConnected ? 'Guardamos tu pedido y se abre WhatsApp con el mensaje escrito. No se paga acá.' : 'Se abre WhatsApp con tu pedido escrito. No se paga acá.'}
+          </p>
+          {saveNote && (
+            <p role="status" className="mt-2 text-sm font-semibold">
+              {saveNote}
+            </p>
+          )}
           {whatsappUrl.length > tooLongUrl && (
             <p role="status" className="mt-2 text-sm font-semibold">
               Tu pedido es largo y WhatsApp podría cortarlo. Si falta algo en el mensaje, avisanos por ahí.

@@ -4,10 +4,13 @@ import type { ListingItem, TodayFilterGroup } from '../pages/today/todayItems'
 // terms of use are still pending from the team. The three pieces below reuse placeholder brand art
 // (public/images), so the preview and the file are the same picture and the resolution is the real
 // size of that file, not a promise about wallpapers. Replace them with the approved files.
-export type DownloadKind = 'celular' | 'computadora' | 'whatsapp'
+/** 'otro' is only for a kind the web does not know (read from the database); the sample has none. */
+export type DownloadKind = 'celular' | 'computadora' | 'whatsapp' | 'otro'
 
 export type DownloadItem = ListingItem & {
   type: DownloadKind
+  /** Terms of use of the resource, when the team wrote them (connected only). */
+  terms?: string
   /** Picture shown on the card. */
   preview: string
   /** Direct file to download: no account, no email. */

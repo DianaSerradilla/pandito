@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { featuredItems } from '../../data/publicCatalog'
+import type { FeaturedItem } from '../../data/publicCatalog'
 import { FeaturedCard } from './FeaturedCard'
 import { ScrollSticker } from './ScrollSticker'
 
@@ -17,7 +17,7 @@ const TILT = { x: 1.5, y: -2, depth: 1200 }
 
 const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n))
 
-function useWallScroll(ref: React.RefObject<HTMLElement | null>) {
+function useWallScroll(ref: React.RefObject<HTMLElement | null>, featuredItems: FeaturedItem[]) {
   useEffect(() => {
     const section = ref.current
     if (!section) return
@@ -41,6 +41,7 @@ function useWallScroll(ref: React.RefObject<HTMLElement | null>) {
       const u = (progress * n) / (1 - HOLD)
       stickers.forEach((el, index) => {
         const item = featuredItems[index]
+        if (!item) return
         const p = clamp(u - index)
         if (lastP[index] === p) return
         lastP[index] = p
@@ -118,12 +119,12 @@ function useWallScroll(ref: React.RefObject<HTMLElement | null>) {
       window.removeEventListener('resize', onResize)
       cancelAnimationFrame(raf)
     }
-  }, [ref])
+  }, [ref, featuredItems])
 }
 
-export function FeaturedStack({ intro }: { intro: ReactNode }) {
+export function FeaturedStack({ intro, items: featuredItems }: { intro: ReactNode; items: FeaturedItem[] }) {
   const ref = useRef<HTMLElement>(null)
-  useWallScroll(ref)
+  useWallScroll(ref, featuredItems)
   const n = featuredItems.length
 
   return (
