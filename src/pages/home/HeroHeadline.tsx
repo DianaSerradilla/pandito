@@ -5,7 +5,7 @@ import { Heading } from '../../components/ui/Heading'
 export function HeroHeadline({ id, lines }: { id: string; lines: string[] }) {
   const label = lines.join(' ')
   return (
-    <Heading id={id} as="h1" size="hero" className="mt-3">
+    <Heading id={id} as="h1" size="hero" className="mt-3" reveal={false}>
       <span className="sr-only">{label}</span>
       <span aria-hidden="true">
         {lines.map((line) => {

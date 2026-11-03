@@ -24,7 +24,7 @@ export function ManifestoSection() {
             <span className="block font-normal">Lo genérico acá</span>
             <span className="block font-extrabold md:text-[1.2em]">no entra.</span>
           </Heading>
-          <p className="mt-5 max-w-md text-balance md:max-w-[33rem] md:text-lg">
+          <p data-reveal className="mt-5 max-w-md text-balance md:max-w-[33rem] md:text-lg">
             Diseño stickers para que tu día no se parezca al de todos. Cada pieza la pienso, la
             trabajo y la curo yo. Si no me convence, no sale.
           </p>
@@ -37,13 +37,13 @@ export function ManifestoSection() {
           <ManifestoMedia
             photos={[
               {
-                src: '/images/pando-sticker-hand.png',
-                alt: 'Mano naranja de Pando sosteniendo stickers ante un cielo azul',
+                src: '/images/estudio-pando-arriba.jpg',
+                alt: 'Pando visto desde arriba, dibujando stickers en su escritorio',
                 tone: 'azul',
               },
               {
-                src: '/images/pando-sticker-wall.png',
-                alt: 'Stickers de Pando sobre una superficie azul',
+                src: '/images/estudio-pando-poster.jpg',
+                alt: 'Pando sentado en su estudio, dibujando frente a la pared de stickers y láminas',
                 tone: 'tinta',
               },
             ]}

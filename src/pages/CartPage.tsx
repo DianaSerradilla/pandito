@@ -90,7 +90,7 @@ export function CartPage() {
   const savedCode = saved?.signature === signature ? saved.code : undefined
 
   const buildMessage = (code?: string) => [
-    code ? `Hola! Quiero hacer este pedido (${code}):` : 'Hola! Quiero hacer este pedido:',
+    code ? `¡Hola! Quiero hacer este pedido (${code}):` : '¡Hola! Quiero hacer este pedido:',
     '',
     ...lines.map((line) => `• ${line.quantity} × ${label(line)} (${formatPrice(line.price * line.quantity)})`),
     ...(pricing.applied.length > 0
@@ -130,7 +130,7 @@ export function CartPage() {
     }
     // A line without a variant id (the database lacks migration 0016) cannot be saved, but it can be sent.
     if (lines.some((line) => !line.variantId)) {
-      setSaveNote('Este pedido tiene productos que todavía no podemos guardar, pero igual podés mandarlo por WhatsApp.')
+      setSaveNote('Este pedido tiene productos que todavía no puedo guardar, pero igual podés mandarlo por WhatsApp.')
       openWhatsApp(null, urlFor())
       return
     }
@@ -149,7 +149,7 @@ export function CartPage() {
     saving.current = false
     if (result.ok) {
       setSaved({ signature, code: result.code })
-      setSaveNote(result.code ? `Guardamos tu pedido (${result.code}). Se abre WhatsApp para confirmarlo.` : 'Guardamos tu pedido. Se abre WhatsApp para confirmarlo.')
+      setSaveNote(result.code ? `Guardé tu pedido (${result.code}). Se abre WhatsApp para confirmarlo.` : 'Guardé tu pedido. Se abre WhatsApp para confirmarlo.')
       openWhatsApp(target, urlFor(result.code))
     } else {
       setSaveNote(result.message)
@@ -175,7 +175,7 @@ export function CartPage() {
         <h1 className="sr-only">Mi pedido</h1>
         <StatusMessage
           kind="error"
-          title="No pudimos cargar tu pedido"
+          title="No pude cargar tu pedido"
           action={
             <div className="flex flex-wrap gap-3">
               <Button onClick={reloadCatalog} variant="secondary">
@@ -390,10 +390,10 @@ export function CartPage() {
                   No elegir franja
                 </button>
               )}
-              <p className="mt-1 text-sm text-tinta/75">Es una preferencia: el día, la hora y el lugar los confirmamos por WhatsApp.</p>
+              <p className="mt-1 text-sm text-tinta/75">Es una preferencia: el día, la hora y el lugar los confirmo por WhatsApp.</p>
             </fieldset>
           ) : (
-            <p className="mt-5 text-sm text-tinta/85">Por ahora no hay franjas publicadas. Escribinos por WhatsApp y vemos cómo coordinar.</p>
+            <p className="mt-5 text-sm text-tinta/85">Por ahora no hay franjas publicadas. Escribime por WhatsApp y vemos cómo coordinar.</p>
           )}
 
           <label className="mt-4 block text-sm font-semibold">
@@ -419,7 +419,7 @@ export function CartPage() {
             </ArrowAnchor>
           </div>
           <p className="mt-3 text-sm text-tinta/75">
-            {isConnected ? 'Guardamos tu pedido y se abre WhatsApp con el mensaje escrito. No se paga acá.' : 'Se abre WhatsApp con tu pedido escrito. No se paga acá.'}
+            {isConnected ? 'Guardé tu pedido y se abre WhatsApp con el mensaje escrito. No se paga acá.' : 'Se abre WhatsApp con tu pedido escrito. No se paga acá.'}
           </p>
           {saveNote && (
             <p role="status" className="mt-2 text-sm font-semibold">

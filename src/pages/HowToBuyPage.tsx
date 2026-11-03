@@ -64,7 +64,7 @@ export function HowToBuyPage() {
                 />
               </div>
               <h2 className="mt-4 font-display text-2xl uppercase leading-none md:text-3xl">{note.title}</h2>
-              <p className="mt-3 text-pretty text-base leading-relaxed text-tinta/85">{note.text}</p>
+              <p data-reveal className="mt-3 text-pretty text-base leading-relaxed text-tinta/85">{note.text}</p>
             </li>
           ))}
         </ul>

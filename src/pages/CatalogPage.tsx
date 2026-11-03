@@ -23,7 +23,7 @@ export function CatalogPage() {
           <span className="block font-normal">Todo el</span>
           <span className="block font-extrabold md:text-[1.2em]">catálogo.</span>
         </Heading>
-        <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-tinta/80 md:text-lg">
+        <p data-reveal className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-tinta/80 md:text-lg">
           Buscá por tema o por color. Si no ves lo tuyo, escribime y lo pensamos juntos.
         </p>
       </header>

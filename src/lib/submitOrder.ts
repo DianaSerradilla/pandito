@@ -10,12 +10,12 @@ export type SubmitResult =
   | { ok: true; id: string; /** The human code ("R-014"); missing if it could not be read back. */ code?: string }
   | { ok: false; message: string }
 
-const FAILED = 'No pudimos guardar el pedido, pero igual podés mandarlo por WhatsApp.'
+const FAILED = 'No pude guardar el pedido, pero igual podés mandarlo por WhatsApp.'
 
 // The server answers with short generic English texts; these are the ones worth telling apart.
 const KNOWN_ERRORS: [needle: string, message: string][] = [
   ['too many requests', 'Hay demasiados pedidos ahora, probá en un rato. Igual podés mandarlo por WhatsApp.'],
-  ['variant not available', 'Alguno de los stickers ya no está disponible, así que no lo guardamos. Igual podés mandarlo por WhatsApp.'],
+  ['variant not available', 'Alguno de los stickers ya no está disponible, así que no lo guardé. Igual podés mandarlo por WhatsApp.'],
 ]
 
 export function friendlyError(raw: unknown): string {

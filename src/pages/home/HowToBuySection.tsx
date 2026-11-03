@@ -12,8 +12,7 @@ type Step = {
   text: string
   accent: string
   ink: string
-  /** Pando for this step. PLACEHOLDER art: raster cut-outs from the Pando sheet, to be replaced by
-   *  the vectorized ones (same names, or change `pando`). */
+  /** Pando for this step: a transparent PNG in public/images. */
   pando: string
 }
 
@@ -24,7 +23,7 @@ const steps: Step[] = [
     text: 'Dale una vuelta al catálogo y quedate con los que más te gusten.',
     accent: 'bg-azul',
     ink: 'text-crema',
-    pando: '/images/pando-zapatilla.png', // choosing a sneaker
+    pando: '/images/pando-compu.png', // browsing the catalog on a laptop
   },
   {
     number: '02',
@@ -32,7 +31,7 @@ const steps: Step[] = [
     text: 'Mandame una captura o una lista por WhatsApp. Sin vueltas.',
     accent: 'bg-naranja',
     ink: 'text-tinta',
-    pando: '/images/pando-camara.png', // "mandame una captura"
+    pando: '/images/pando-cafe.png', // on his way, coffee in hand
   },
   {
     number: '03',
@@ -40,7 +39,7 @@ const steps: Step[] = [
     text: 'Te confirmo disponibilidad, demora y cuándo podés retirarlos.',
     accent: 'bg-tinta',
     ink: 'text-crema',
-    pando: '/images/pando-camina.png', // off with his bag
+    pando: '/images/pando-bolsa.png', // off with his bag
   },
 ]
 

@@ -115,8 +115,8 @@ function ProductView({ product }: { product: Product }) {
   })
 
   // The request for a whole sheet: the team answers with the price, so nothing is added to the order.
-  const sheetMessage = `Hola! Quiero pedir una plancha entera del sticker "${item.name}"${variants ? ` (${materialLabel}, ${sizeLabel})` : ''}. ¿Me pasás el precio? Ref: ${item.slug}`
-  const askMessage = `Hola! Me interesa el sticker "${item.name}" (${materialLabel}, ${sizeLabel}). ¿Me contás si se puede? Ref: ${item.slug}`
+  const sheetMessage = `¡Hola! Quiero pedir una plancha entera del sticker "${item.name}"${variants ? ` (${materialLabel}, ${sizeLabel})` : ''}. ¿Me pasás el precio? Ref: ${item.slug}`
+  const askMessage = `¡Hola! Me interesa el sticker "${item.name}" (${materialLabel}, ${sizeLabel}). ¿Me contás si se puede? Ref: ${item.slug}`
   const askUrl = `${site.whatsappUrl}?text=${encodeURIComponent(askMessage)}`
   const sheetUrl = `${site.whatsappUrl}?text=${encodeURIComponent(sheetMessage)}`
 
@@ -289,10 +289,10 @@ export function ProductPage() {
   if (status === 'error') {
     return (
       <div className="mx-auto max-w-xl py-10 md:py-20">
-        <h1 className="sr-only">No pudimos cargar el sticker</h1>
+        <h1 className="sr-only">No pude cargar el sticker</h1>
         <StatusMessage
           kind="error"
-          title="No pudimos cargar el sticker"
+          title="No pude cargar el sticker"
           action={
             <div className="flex flex-wrap gap-3">
               <Button onClick={retry} variant="secondary">

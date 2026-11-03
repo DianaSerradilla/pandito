@@ -11,7 +11,7 @@ export const pageTitle = (name: string) => `${name} | ${brand}`
 export const routeMeta: Record<string, PageMeta> = {
   [paths.home]: {
     title: 'Pandito Stickers',
-    description: 'Stickers de Pandito. Mirá el catálogo y armá tu pedido por WhatsApp.',
+    description: 'Soy Pando y esto es mi estudio. Stickers originales y de mansa calidad.',
   },
   [paths.about]: {
     title: pageTitle(navLabels.about),

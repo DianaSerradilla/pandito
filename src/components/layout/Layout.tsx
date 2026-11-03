@@ -1,5 +1,6 @@
-import { Outlet, useLocation } from 'react-router'
+import { Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { routeMeta } from '../../config/pageMeta'
+import { useReveal } from '../../hooks/useReveal'
 import { usePageMeta } from '../../lib/pageMeta'
 import { Container } from '../ui/Container'
 import { Footer } from './Footer'
@@ -19,6 +20,8 @@ function PageMetaTags({ meta }: { meta: Parameters<typeof usePageMeta>[0] }) {
 }
 
 export function Layout() {
+  const { pathname } = useLocation()
+  useReveal()
   return (
     <div className="flex min-h-screen flex-col">
       <a
@@ -28,10 +31,14 @@ export function Layout() {
         Saltar al contenido
       </a>
       <RouteMeta />
+      {/* A new page starts at the top; going back restores where the visitor was. */}
+      <ScrollRestoration />
       <Header />
       <main id="contenido" tabIndex={-1} className="flex-1 outline-none">
         <Container className="py-10">
-          <Outlet />
+          <div key={pathname} className="page-in">
+            <Outlet />
+          </div>
         </Container>
       </main>
       <Footer />

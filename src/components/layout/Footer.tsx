@@ -3,7 +3,8 @@ import { site } from '../../config/site'
 import { Container } from '../ui/Container'
 import { Heading } from '../ui/Heading'
 import { Scribble } from './Scribble'
-import { footerNav } from './navItems'
+import { useTodayAvailable } from '../../data/useTodayAvailable'
+import { footerNav, withoutToday } from './navItems'
 
 const linkClass = 'group relative inline-flex min-h-11 items-center'
 
@@ -15,6 +16,7 @@ function scrollToTop() {
 }
 
 export function Footer() {
+  const hasToday = useTodayAvailable()
   const social = [{ href: site.instagramUrl, label: 'Instagram' }].filter((l) => l.href)
 
   return (
@@ -33,7 +35,7 @@ export function Footer() {
           <nav aria-label="Navegación">
             <Heading as="h2" size="subtitle">Navegación</Heading>
             <ul className="mt-4 flex flex-col gap-1">
-              {footerNav.map((item) => (
+              {withoutToday(footerNav, hasToday).map((item) => (
                 <li key={item.to}>
                   <NavLink to={item.to} end={item.to === '/'} className={linkClass}>
                     {({ isActive }) => (

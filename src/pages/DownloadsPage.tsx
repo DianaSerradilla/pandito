@@ -36,7 +36,7 @@ export function DownloadsPage() {
           <span className="block font-normal">Descargas</span>
           <span className="block font-extrabold md:text-[1.2em]">para vos.</span>
         </Heading>
-        <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-tinta/80 md:text-lg">
+        <p data-reveal className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-tinta/80 md:text-lg">
           Fondos y stickers para tu celular y tu compu. Se bajan directo, sin cuenta y sin dejar tu mail.
         </p>
         <p className="mx-auto mt-3 max-w-md text-pretty text-sm text-tinta/75">Para uso personal, no comercial.</p>

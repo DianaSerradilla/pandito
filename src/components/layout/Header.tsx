@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { paths } from '../../paths'
 import { site } from '../../config/site'
+import { useTodayAvailable } from '../../data/useTodayAvailable'
 import { useOrderCount } from '../../lib/orderStore'
 import { Container } from '../ui/Container'
 import { stickerBase, stickerSize, stickerTone, tilt } from '../ui/sticker'
-import { cartNav, mainNav } from './navItems'
+import { cartNav, mainNav, withoutToday } from './navItems'
 
 // Main nav "stickers pegados": each link is a sticker (see ui/sticker.ts). Orange is the
 // protagonist: the active item is stuck in orange with cream text, hover turns orange.
@@ -17,6 +18,7 @@ export function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const orderCount = useOrderCount()
+  const navItems = withoutToday(mainNav, useTodayAvailable())
 
   useEffect(() => {
     if (!open) return
@@ -51,7 +53,7 @@ export function Header() {
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-2.5 md:flex">
-          {mainNav.map((item, i) => (
+          {navItems.map((item, i) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -109,7 +111,7 @@ export function Header() {
           className="max-h-[calc(100svh-4.75rem)] overflow-y-auto overscroll-contain border-b-2 border-tinta px-4 pb-8 pt-2 md:hidden"
         >
           <ul className="flex flex-col items-start gap-4">
-            {mainNav.map((item, i) => (
+            {navItems.map((item, i) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}

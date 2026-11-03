@@ -188,7 +188,7 @@ export function ShopListing<T extends ListingItem>({ items, groups, renderGroup 
       <div className="mx-auto max-w-xl">
         <StatusMessage
           kind="error"
-          title={`No pudimos cargar los ${noun.many}`}
+          title={`No pude cargar los ${noun.many}`}
           action={
             <div className="flex flex-wrap gap-3">
               <button type="button" onClick={onRetry ?? (() => window.location.reload())} className={textButton}>

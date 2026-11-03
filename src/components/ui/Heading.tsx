@@ -25,6 +25,8 @@ type Props = {
   size?: keyof typeof sizes
   family?: keyof typeof families
   className?: string
+  /** Fade in the first time it comes into view. Turn off where the page animates it itself. */
+  reveal?: boolean
   children: ReactNode
 }
 
@@ -35,12 +37,14 @@ export function Heading({
   size = 'title',
   family = 'display',
   className,
+  reveal = true,
   children,
 }: Props) {
   warnIfTooLong(children, 'Heading')
   return (
     <Tag
       id={id}
+      {...(reveal ? { 'data-reveal': '' } : {})}
       className={['uppercase', families[family], sizes[size], className].filter(Boolean).join(' ')}
     >
       {children}

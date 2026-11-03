@@ -6,7 +6,7 @@ import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 // PROVISIONAL COPY in Pando's voice. Cream disc with ink text (tinta on crema is an approved pair)
 // and the orange isotipo P in the middle (isotipo use for seals, per the manual).
 // Static with prefers-reduced-motion. Decorative, so hidden from assistive tech.
-const PHRASE = 'ASÍ SCROLLEO YO'
+const PHRASE = 'Así scrolleo yo'
 const RING_ID = 'scroll-sticker-ring'
 
 export function ScrollSticker({ className }: { className?: string }) {

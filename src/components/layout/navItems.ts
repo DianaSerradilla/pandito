@@ -8,6 +8,10 @@ export const mainNav = [
   { to: paths.today, label: navLabels.today },
 ] as const
 
+/** HOY only appears in the nav while there is an event with pieces for today (useTodayAvailable). */
+export const withoutToday = <T extends { to: string }>(items: readonly T[], hasToday: boolean) =>
+  hasToday ? items : items.filter((item) => item.to !== paths.today)
+
 export const cartNav = { to: paths.cart, label: navLabels.cart } as const
 
 export const footerNav: { to: string; label: string }[] = [
