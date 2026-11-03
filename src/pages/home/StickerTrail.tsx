@@ -1,25 +1,20 @@
-import { asset } from '../../lib/asset'
 import { useEffect, useRef, type RefObject } from 'react'
 import { useCursorMotion } from '../../hooks/useCursorMotion'
+import { closingStickers as stickers } from './closingStickers'
 
 // Stickers that pop out along the mouse path (reference: the closing section of extrafazant.nl).
 // Observed behavior, reproduced with our own values (the reference timing could not be measured):
 // every few hundred px of mouse travel one sticker appears at the cursor, tilted at random, pops in,
 // stays a moment and fades. A small pool of elements is reused, so nothing piles up.
-// The stickers are PLACEHOLDERS made from brand pieces; swap `stickers` for the real designs.
-// They sit on the ink background, where the orange logo and isotipo are approved. If this ever
-// moves to azul or yellow, give the logo and isotipo a cream plate (the manual forbids them there).
+// The stickers are the team's own designs (see closingStickers.ts); they carry their own borders and
+// sit on the ink background. They are downloaded the first time the pointer enters the section, so
+// no piece pops out empty and nothing is fetched for a visitor who never gets there.
 // Only with a mouse and without prefers-reduced-motion; otherwise three static stickers are shown.
 // Decorative, so hidden from assistive tech. Stickers sit behind the text.
 //
 // Team adjustments: stickers come out less often (far apart and never too soon after the last one),
 // are bigger, and never appear close to an edge of the section, so none is cut off. `aspect` is the
 // height over the width of each piece, used to know how much room it needs.
-const stickers = [
-  { src: asset('/brand/isotipo-naranja.svg'), width: 120, aspect: 135.8 / 91.4 },
-  { src: asset('/brand/logotipo-naranja.svg'), width: 250, aspect: 175 / 371 },
-  { src: asset('/brand/pando.svg'), width: 140, aspect: 757 / 385 },
-]
 const POOL = 12
 const SPACING = 140 // px of mouse travel between stickers
 const MIN_GAP = 220 // ms between one sticker and the next
@@ -31,19 +26,19 @@ function StaticStickers() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       <img
-        src={stickers[1].src}
+        src={stickers[6].src}
         alt=""
-        className="die-cut absolute left-[5%] top-[14%] w-40 -rotate-[10deg] md:w-60"
+        className="absolute left-[5%] top-[14%] w-28 -rotate-[10deg] md:w-44"
       />
       <img
         src={stickers[2].src}
         alt=""
-        className="die-cut absolute right-[7%] top-[18%] w-20 rotate-[9deg] md:w-32"
+        className="absolute right-[7%] top-[18%] w-20 rotate-[9deg] md:w-32"
       />
       <img
         src={stickers[0].src}
         alt=""
-        className="die-cut absolute bottom-[14%] left-[14%] w-16 rotate-[7deg] md:w-28"
+        className="absolute bottom-[14%] left-[14%] w-16 rotate-[7deg] md:w-28"
       />
     </div>
   )
@@ -62,7 +57,7 @@ export function StickerTrail({ sectionRef }: { sectionRef: RefObject<HTMLElement
       const img = document.createElement('img')
       img.alt = ''
       img.draggable = false
-      img.className = 'die-cut absolute left-0 top-0 h-auto opacity-0'
+      img.className = 'absolute left-0 top-0 h-auto opacity-0'
       layer.appendChild(img)
       return img
     })
@@ -113,8 +108,12 @@ export function StickerTrail({ sectionRef }: { sectionRef: RefObject<HTMLElement
       )
     }
 
+    const preload = () => stickers.forEach((s) => { new Image().src = s.src })
+
+    section.addEventListener('pointerenter', preload, { once: true })
     section.addEventListener('pointermove', onMove)
     return () => {
+      section.removeEventListener('pointerenter', preload)
       section.removeEventListener('pointermove', onMove)
       pool.forEach((el) => {
         el.getAnimations().forEach((a) => a.cancel())

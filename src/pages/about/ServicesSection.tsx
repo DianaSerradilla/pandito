@@ -10,16 +10,15 @@ import { SafeImage } from '../../components/ui/SafeImage'
 // pinned). A sticker sits across the seam, scrolling with the text. On a phone each service
 // stacks: text, then its picture.
 // The three services follow the approved line "Cada pieza es pensada, trabajada y curada".
-// PLACEHOLDER pictures and PROVISIONAL COPY: the team replaces both.
+// The pictures are the team's own (public/images/servicios, one per title). PROVISIONAL COPY.
 type Service = {
   eyebrow: string
   title: string
   text: string
   /** Colored panel. */
   bg: string
-  /** Picture in the frame (transparent art over the dark frame). */
+  /** Photo that fills the frame. */
   image: string
-  cut?: boolean
   /** Sticker across the seam, anchored to the right edge of the text block. */
   sticker: { src: string; className: string }
 }
@@ -30,8 +29,7 @@ const services: Service[] = [
     title: 'Pensado',
     text: 'Antes de dibujar, pienso. Qué querés decir, dónde va a vivir el sticker y quién lo va a ver. Un buen diseño empieza con una buena pregunta, no con un lápiz. Así cada pieza tiene un porqué.',
     bg: 'bg-azul',
-    image: asset('/images/pando-camara.png'),
-    cut: true,
+    image: asset('/images/servicios/pensado.jpg'),
     sticker: { src: asset('/stickers/star-eye.svg'), className: 'top-[16%] w-36 -rotate-[12deg]' },
   },
   {
@@ -39,8 +37,7 @@ const services: Service[] = [
     title: 'Trabajado',
     text: 'Dibujo, pruebo, borro y vuelvo a dibujar. Lo que hago lo podés palpar: líneas con carácter, colores que se ven y un acabado que aguanta el uso de todos los días. Nada de plantillas.',
     bg: 'bg-amarillo',
-    image: asset('/images/pando-zapatilla.png'),
-    cut: true,
+    image: asset('/images/servicios/trabajado.jpg'),
     sticker: { src: asset('/stickers/isotipo-disc.svg'), className: 'bottom-[14%] w-36 rotate-[10deg]' },
   },
   {
@@ -48,23 +45,24 @@ const services: Service[] = [
     title: 'Curado',
     text: 'No todo sale. Si una pieza no me convence, no se publica. Elijo lo que muestro y cómo lo muestro, para que cada sticker que llega a tus manos valga la pena. Hecho en Mendoza.',
     bg: 'bg-naranja',
-    image: asset('/images/pando-camina.png'),
-    cut: true,
+    image: asset('/images/servicios/curado.jpg'),
     sticker: { src: asset('/stickers/logotipo-label.svg'), className: 'top-[18%] w-52 -rotate-[8deg]' },
   },
 ]
 
-// The dark frame with the picture, the same on the phone and on the pinned panel.
+// The frame with the photo, the same on the phone and on the pinned panel. The photos are about
+// square, so the frame is too and `object-cover` trims almost nothing. The width is also capped by the
+// height of the screen so the frame always fits inside the pinned panel.
 function Frame({ service }: { service: Service }) {
   return (
-    <div className="grid aspect-[4/5] w-[min(78%,24rem)] place-items-center overflow-hidden rounded-[0.25rem] bg-tinta md:w-[min(74%,33rem)]">
+    <div className="aspect-square w-[min(78%,24rem)] overflow-hidden rounded-[0.25rem] bg-tinta md:w-[min(74%,33rem,78svh)]">
       <SafeImage
         src={service.image}
         alt=""
         fallback={null}
         draggable={false}
         loading="lazy"
-        className={`h-[82%] w-auto max-w-[80%] select-none object-contain ${service.cut ? 'die-cut' : ''}`}
+        className="block h-full w-full select-none object-cover"
       />
     </div>
   )
