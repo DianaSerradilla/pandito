@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import { paths } from '../paths'
 import { ArrowLink } from '../components/ui/ArrowLink'
 import { Script } from '../components/ui/Script'
@@ -14,19 +15,19 @@ const notes: { title: string; text: string; image: string; tone: TodayTone; cut?
   {
     title: 'Hay en stock',
     text: 'Tengo muchos diseños listos para llevar. Igual, antes de que nos veamos te confirmo que lo que elegiste esté disponible.',
-    image: '/stickers/isotipo-disc.svg',
+    image: asset('/stickers/isotipo-disc.svg'),
     tone: 'azul',
   },
   {
     title: 'Si no está, se pide',
     text: '¿Querés un diseño agotado, otro tamaño u otro material? Se puede solicitar. Escribime y te cuento cuánto demora.',
-    image: '/stickers/star-eye.svg',
+    image: asset('/stickers/star-eye.svg'),
     tone: 'amarillo',
   },
   {
     title: 'Nos vemos en un punto de encuentro',
     text: 'La entrega es en mano, en un punto de encuentro. El lugar y el momento los acordamos por WhatsApp.',
-    image: '/brand/pando-mano-senalar.svg',
+    image: asset('/brand/pando-mano-senalar.svg'),
     tone: 'naranja',
     cut: true,
   },

@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useState, type CSSProperties } from 'react'
 import { SafeImage } from '../../components/ui/SafeImage'
 import { tones } from '../today/tones'
@@ -154,7 +155,7 @@ export function ProductGallery({ item, material, size }: Props) {
               <SafeImage
                 loading="lazy"
                 decoding="async"
-                src="/images/featured-laptop.jpg"
+                src={asset('/images/featured-laptop.jpg')}
                 alt=""
                 draggable={false}
                 fallback={<div className="absolute inset-0 bg-tinta" />}

@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { paths } from '../../paths'
@@ -49,7 +50,7 @@ export function Header() {
       >
         {/* Isotipo P: the manual's version for small sizes. Orange on cream. */}
         <Link to={paths.home} onClick={close} className="inline-flex min-w-11 shrink-0 items-center justify-self-start">
-          <img src="/brand/isotipo-naranja.svg" alt={site.name} className="h-11 w-auto max-w-none" />
+          <img src={asset('/brand/isotipo-naranja.svg')} alt={site.name} className="h-11 w-auto max-w-none" />
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-2.5 md:flex">

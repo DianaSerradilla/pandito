@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useRef, type RefObject } from 'react'
 import { useCursorMotion } from '../../hooks/useCursorMotion'
 
@@ -15,9 +16,9 @@ import { useCursorMotion } from '../../hooks/useCursorMotion'
 // are bigger, and never appear close to an edge of the section, so none is cut off. `aspect` is the
 // height over the width of each piece, used to know how much room it needs.
 const stickers = [
-  { src: '/brand/isotipo-naranja.svg', width: 120, aspect: 135.8 / 91.4 },
-  { src: '/brand/logotipo-naranja.svg', width: 250, aspect: 175 / 371 },
-  { src: '/brand/pando.svg', width: 140, aspect: 757 / 385 },
+  { src: asset('/brand/isotipo-naranja.svg'), width: 120, aspect: 135.8 / 91.4 },
+  { src: asset('/brand/logotipo-naranja.svg'), width: 250, aspect: 175 / 371 },
+  { src: asset('/brand/pando.svg'), width: 140, aspect: 757 / 385 },
 ]
 const POOL = 12
 const SPACING = 140 // px of mouse travel between stickers

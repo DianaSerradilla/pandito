@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
@@ -53,7 +54,7 @@ export function ScrollSticker({ className }: { className?: string }) {
         </text>
       </g>
       <circle cx="100" cy="100" r="40" fill="none" strokeWidth="3" className="stroke-tinta" />
-      <image href="/brand/isotipo-naranja.svg" x="84" y="76" width="32" height="48" />
+      <image href={asset('/brand/isotipo-naranja.svg')} x="84" y="76" width="32" height="48" />
     </svg>
   )
 }

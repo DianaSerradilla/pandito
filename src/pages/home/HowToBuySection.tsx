@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useRef, type RefObject } from 'react'
 import { site } from '../../config/site'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
@@ -23,7 +24,7 @@ const steps: Step[] = [
     text: 'Dale una vuelta al catálogo y quedate con los que más te gusten.',
     accent: 'bg-azul',
     ink: 'text-crema',
-    pando: '/images/pando-compu.png', // browsing the catalog on a laptop
+    pando: asset('/images/pando-compu.png'), // browsing the catalog on a laptop
   },
   {
     number: '02',
@@ -31,7 +32,7 @@ const steps: Step[] = [
     text: 'Mandame una captura o una lista por WhatsApp. Sin vueltas.',
     accent: 'bg-naranja',
     ink: 'text-tinta',
-    pando: '/images/pando-cafe.png', // on his way, coffee in hand
+    pando: asset('/images/pando-cafe.png'), // on his way, coffee in hand
   },
   {
     number: '03',
@@ -39,7 +40,7 @@ const steps: Step[] = [
     text: 'Te confirmo disponibilidad, demora y cuándo podés retirarlos.',
     accent: 'bg-tinta',
     ink: 'text-crema',
-    pando: '/images/pando-bolsa.png', // off with his bag
+    pando: asset('/images/pando-bolsa.png'), // off with his bag
   },
 ]
 

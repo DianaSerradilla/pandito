@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { paths } from '../../paths'
 import { Heading } from '../../components/ui/Heading'
 import { Script } from '../../components/ui/Script'
@@ -37,12 +38,12 @@ export function ManifestoSection() {
           <ManifestoMedia
             photos={[
               {
-                src: '/images/estudio-pando-arriba.jpg',
+                src: asset('/images/estudio-pando-arriba.jpg'),
                 alt: 'Pando visto desde arriba, dibujando stickers en su escritorio',
                 tone: 'azul',
               },
               {
-                src: '/images/estudio-pando-poster.jpg',
+                src: asset('/images/estudio-pando-poster.jpg'),
                 alt: 'Pando sentado en su estudio, dibujando frente a la pared de stickers y láminas',
                 tone: 'tinta',
               },
@@ -62,7 +63,7 @@ export function ManifestoSection() {
       >
         <div className="absolute bottom-0 left-0 w-44 origin-bottom -translate-x-1/2 -rotate-[67deg] lg:w-56">
           <img
-            src="/brand/pando-mano-senalar.svg"
+            src={asset('/brand/pando-mano-senalar.svg')}
             alt=""
             className="pando-point block w-full select-none"
           />

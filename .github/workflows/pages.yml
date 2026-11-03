@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+# Builds the site and publishes dist/ on every push to main.
+# Needs: Settings > Pages > Source = "GitHub Actions", and these repository variables
+# (Settings > Secrets and variables > Actions > Variables): VITE_SUPABASE_URL,
+# VITE_SUPABASE_ANON_KEY and, once there is a domain, VITE_SITE_URL.
+# VITE_BASE is "/<repo>/" here. At a custom domain root, set the repository variable
+# VITE_BASE to "/" and it replaces this default.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_BASE: ${{ vars.VITE_BASE || format('/{0}/', github.event.repository.name) }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+      # GitHub Pages serves 404.html for any path it does not know. Using the app shell as that
+      # page lets a reload on /catalogo load the app, and the router draws the right page.
+      - run: cp dist/index.html dist/404.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

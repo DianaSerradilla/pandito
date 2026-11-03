@@ -32,12 +32,18 @@ function seoFiles(siteUrl: string): Plugin {
 }
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss(), seoFiles(loadEnv(mode, process.cwd(), '').VITE_SITE_URL ?? '')],
-  server: {
-    // Forward /api calls to the local Node server (see server/index.js).
-    proxy: {
-      '/api': 'http://localhost:3001',
+// VITE_BASE is the path the site is served from: "/" at a domain root (the default), "/pandito/" on a
+// GitHub Pages project site. The router and every public file URL read it through BASE_URL.
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
+    base: env.VITE_BASE || '/',
+    plugins: [react(), tailwindcss(), seoFiles(env.VITE_SITE_URL ?? '')],
+    server: {
+      // Forward /api calls to the local Node server (see server/index.js).
+      proxy: {
+        '/api': 'http://localhost:3001',
+      },
     },
-  },
-}))
+  }
+})

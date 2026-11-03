@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useRef } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { Heading } from '../../components/ui/Heading'
@@ -27,17 +28,17 @@ type Piece = {
 
 const pieces: Piece[] = [
   { kind: 'badge', tilt: 0 },
-  { kind: 'sticker', src: '/stickers/isotipo-disc.svg', tilt: -8 },
-  { kind: 'tile', src: '/images/pando-sticker-wall.png', wide: true, tilt: 4 },
-  { kind: 'sticker', src: '/brand/pando-mano-senalar.svg', cut: true, tilt: 12 },
-  { kind: 'sticker', src: '/stickers/star-eye.svg', tilt: -10 },
-  { kind: 'sticker', src: '/images/pando-camina.png', cut: true, tilt: 6 },
-  { kind: 'sticker', src: '/stickers/logotipo-label.svg', wide: true, tilt: -6 },
-  { kind: 'tile', src: '/images/featured-laptop.jpg', tilt: -4 },
-  { kind: 'sticker', src: '/images/pando-camara.png', cut: true, tilt: -7 },
-  { kind: 'sticker', src: '/brand/pando.svg', cut: true, tilt: 9 },
-  { kind: 'tile', src: '/images/pando-sticker-hand.png', tilt: 5 },
-  { kind: 'sticker', src: '/images/pando-zapatilla.png', cut: true, tilt: -5 },
+  { kind: 'sticker', src: asset('/stickers/isotipo-disc.svg'), tilt: -8 },
+  { kind: 'tile', src: asset('/images/pando-sticker-wall.png'), wide: true, tilt: 4 },
+  { kind: 'sticker', src: asset('/brand/pando-mano-senalar.svg'), cut: true, tilt: 12 },
+  { kind: 'sticker', src: asset('/stickers/star-eye.svg'), tilt: -10 },
+  { kind: 'sticker', src: asset('/images/pando-camina.png'), cut: true, tilt: 6 },
+  { kind: 'sticker', src: asset('/stickers/logotipo-label.svg'), wide: true, tilt: -6 },
+  { kind: 'tile', src: asset('/images/featured-laptop.jpg'), tilt: -4 },
+  { kind: 'sticker', src: asset('/images/pando-camara.png'), cut: true, tilt: -7 },
+  { kind: 'sticker', src: asset('/brand/pando.svg'), cut: true, tilt: 9 },
+  { kind: 'tile', src: asset('/images/pando-sticker-hand.png'), tilt: 5 },
+  { kind: 'sticker', src: asset('/images/pando-zapatilla.png'), cut: true, tilt: -5 },
 ]
 
 export function OrbitHero() {

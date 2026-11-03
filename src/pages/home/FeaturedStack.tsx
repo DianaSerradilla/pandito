@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useRef, type ReactNode } from 'react'
 import type { FeaturedItem } from '../../data/publicCatalog'
 import { FeaturedCard } from './FeaturedCard'
@@ -142,7 +143,7 @@ export function FeaturedStack({ intro, items: featuredItems }: { intro: ReactNod
             free of other stickers. */}
         <div className="absolute bottom-0 right-0 aspect-[4/5] h-[70svh] md:bottom-auto md:top-0 md:aspect-auto md:h-svh md:w-[67vw]">
           <img
-            src="/images/featured-laptop.jpg"
+            src={asset('/images/featured-laptop.jpg')}
             alt=""
             aria-hidden="true"
             draggable={false}

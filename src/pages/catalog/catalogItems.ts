@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import type { TodayFilterGroup, TodayItem, TodayTone } from '../today/todayItems'
 
 // REQ-WEB-CATALOG-*. SAMPLE DATA: the real catalog comes from the internal panel (Supabase) later.
@@ -89,14 +90,14 @@ export const catalogFilterGroups: TodayFilterGroup<CatalogItem>[] = [
 
 // PLACEHOLDER art: the brand pieces repeated under different names and topics.
 const art = [
-  { image: '/stickers/isotipo-disc.svg', cut: false },
-  { image: '/stickers/star-eye.svg', cut: false },
-  { image: '/stickers/logotipo-label.svg', cut: false },
-  { image: '/brand/pando.svg', cut: true },
-  { image: '/brand/pando-mano-senalar.svg', cut: true },
-  { image: '/images/pando-camina.png', cut: true },
-  { image: '/images/pando-camara.png', cut: true },
-  { image: '/images/pando-zapatilla.png', cut: true },
+  { image: asset('/stickers/isotipo-disc.svg'), cut: false },
+  { image: asset('/stickers/star-eye.svg'), cut: false },
+  { image: asset('/stickers/logotipo-label.svg'), cut: false },
+  { image: asset('/brand/pando.svg'), cut: true },
+  { image: asset('/brand/pando-mano-senalar.svg'), cut: true },
+  { image: asset('/images/pando-camina.png'), cut: true },
+  { image: asset('/images/pando-camara.png'), cut: true },
+  { image: asset('/images/pando-zapatilla.png'), cut: true },
 ]
 const tones: TodayTone[] = ['naranja', 'azul', 'amarillo', 'tinta']
 

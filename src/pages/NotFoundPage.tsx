@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import { pageTitle } from '../config/pageMeta'
 import { usePageMeta } from '../lib/pageMeta'
 import { paths } from '../paths'
@@ -36,7 +37,7 @@ export function NotFoundPage({ kind = 'not-found' }: Props) {
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center py-10 text-center md:py-20">
       <img
-        src="/brand/pando.svg"
+        src={asset('/brand/pando.svg')}
         alt=""
         aria-hidden="true"
         draggable={false}

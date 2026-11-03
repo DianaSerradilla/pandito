@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import { normalize } from '../lib/text'
 import type { CatalogFamily, CatalogItem, CatalogTopic } from '../pages/catalog/catalogItems'
 import type { FeaturedItem } from '../pages/home/featuredItems'
@@ -249,7 +250,7 @@ export function buildCatalog(
       kind: 'Sticker',
       tags: ['Stickers'],
       // No picture yet: the brand's Pando stands in, so the card is never a broken image.
-      image: cover ? imageUrl(cover.thumb_path ?? cover.storage_path) : '/brand/pando.svg',
+      image: cover ? imageUrl(cover.thumb_path ?? cover.storage_path) : asset('/brand/pando.svg'),
       cut: !cover,
       tone: toneOf(product.slug),
       price: Math.min(...pool.map((variant) => variant.price)),
@@ -293,7 +294,7 @@ export function buildCatalog(
       ...featuredLayout[index],
       slug: product.slug,
       name: product.name,
-      image: fullImages.get(product.slug) ?? '/brand/pando.svg',
+      image: fullImages.get(product.slug) ?? asset('/brand/pando.svg'),
       cut: !fullImages.has(product.slug),
     }))
 

@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 export type StickerSpot = {
   /** Center of the sticker, in % of the photo box. */
   x: number
@@ -38,7 +39,7 @@ export const featuredItems: FeaturedItem[] = [
   {
     slug: 'cat-01',
     name: 'Sticker isotipo',
-    image: '/stickers/isotipo-disc.svg',
+    image: asset('/stickers/isotipo-disc.svg'),
     x: 76,
     y: 22,
     width: 23,
@@ -49,7 +50,7 @@ export const featuredItems: FeaturedItem[] = [
   {
     slug: 'cat-02',
     name: 'Sticker Pando',
-    image: '/brand/pando.svg',
+    image: asset('/brand/pando.svg'),
     cut: true,
     x: 52,
     y: 47,
@@ -61,7 +62,7 @@ export const featuredItems: FeaturedItem[] = [
   {
     slug: 'cat-03',
     name: 'Sticker logotipo',
-    image: '/stickers/logotipo-label.svg',
+    image: asset('/stickers/logotipo-label.svg'),
     x: 66,
     y: 62,
     width: 40,
@@ -72,7 +73,7 @@ export const featuredItems: FeaturedItem[] = [
   {
     slug: 'cat-04',
     name: 'Sticker ojo',
-    image: '/stickers/star-eye.svg',
+    image: asset('/stickers/star-eye.svg'),
     x: 54,
     y: 24,
     width: 21,
@@ -83,7 +84,7 @@ export const featuredItems: FeaturedItem[] = [
   {
     slug: 'cat-05',
     name: 'Sticker mano',
-    image: '/brand/pando-mano-senalar.svg',
+    image: asset('/brand/pando-mano-senalar.svg'),
     cut: true,
     x: 80,
     y: 43,

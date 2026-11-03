@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useEffect, useRef, type RefObject } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { SafeImage } from '../../components/ui/SafeImage'
@@ -29,27 +30,27 @@ const services: Service[] = [
     title: 'Pensado',
     text: 'Antes de dibujar, pienso. Qué querés decir, dónde va a vivir el sticker y quién lo va a ver. Un buen diseño empieza con una buena pregunta, no con un lápiz. Así cada pieza tiene un porqué.',
     bg: 'bg-azul',
-    image: '/images/pando-camara.png',
+    image: asset('/images/pando-camara.png'),
     cut: true,
-    sticker: { src: '/stickers/star-eye.svg', className: 'top-[16%] w-36 -rotate-[12deg]' },
+    sticker: { src: asset('/stickers/star-eye.svg'), className: 'top-[16%] w-36 -rotate-[12deg]' },
   },
   {
     eyebrow: 'Después, las manos.',
     title: 'Trabajado',
     text: 'Dibujo, pruebo, borro y vuelvo a dibujar. Lo que hago lo podés palpar: líneas con carácter, colores que se ven y un acabado que aguanta el uso de todos los días. Nada de plantillas.',
     bg: 'bg-amarillo',
-    image: '/images/pando-zapatilla.png',
+    image: asset('/images/pando-zapatilla.png'),
     cut: true,
-    sticker: { src: '/stickers/isotipo-disc.svg', className: 'bottom-[14%] w-36 rotate-[10deg]' },
+    sticker: { src: asset('/stickers/isotipo-disc.svg'), className: 'bottom-[14%] w-36 rotate-[10deg]' },
   },
   {
     eyebrow: 'Al final, el criterio.',
     title: 'Curado',
     text: 'No todo sale. Si una pieza no me convence, no se publica. Elijo lo que muestro y cómo lo muestro, para que cada sticker que llega a tus manos valga la pena. Hecho en Mendoza.',
     bg: 'bg-naranja',
-    image: '/images/pando-camina.png',
+    image: asset('/images/pando-camina.png'),
     cut: true,
-    sticker: { src: '/stickers/logotipo-label.svg', className: 'top-[18%] w-52 -rotate-[8deg]' },
+    sticker: { src: asset('/stickers/logotipo-label.svg'), className: 'top-[18%] w-52 -rotate-[8deg]' },
   },
 ]
 

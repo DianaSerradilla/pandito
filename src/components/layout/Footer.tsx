@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { NavLink } from 'react-router'
 import { site } from '../../config/site'
 import { Container } from '../ui/Container'
@@ -27,7 +28,7 @@ export function Footer() {
           <img
             loading="lazy"
             decoding="async"
-            src="/brand/logotipo-crema.svg"
+            src={asset('/brand/logotipo-crema.svg')}
             alt={site.name}
             className="h-auto w-64 self-start md:w-80"
           />

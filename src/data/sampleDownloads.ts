@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import type { ListingItem, TodayFilterGroup } from '../pages/today/todayItems'
 
 // REQ-WEB-DOWNLOAD-001 — free downloads. SAMPLE DATA: the final files, formats, resolutions and the
@@ -25,8 +26,8 @@ export const downloadItems: DownloadItem[] = [
     name: 'Recurso de ejemplo 1',
     kind: 'Fondo de celular',
     type: 'celular',
-    preview: '/images/pando-camina.png',
-    file: '/images/pando-camina.png',
+    preview: asset('/images/pando-camina.png'),
+    file: asset('/images/pando-camina.png'),
     format: 'PNG',
     resolution: '277 × 442 px',
   },
@@ -35,8 +36,8 @@ export const downloadItems: DownloadItem[] = [
     name: 'Recurso de ejemplo 2',
     kind: 'Fondo de computadora',
     type: 'computadora',
-    preview: '/images/pando-sticker-wall.png',
-    file: '/images/pando-sticker-wall.png',
+    preview: asset('/images/pando-sticker-wall.png'),
+    file: asset('/images/pando-sticker-wall.png'),
     format: 'PNG',
     resolution: '455 × 606 px',
   },
@@ -45,8 +46,8 @@ export const downloadItems: DownloadItem[] = [
     name: 'Recurso de ejemplo 3',
     kind: 'Sticker de WhatsApp',
     type: 'whatsapp',
-    preview: '/images/pando-zapatilla.png',
-    file: '/images/pando-zapatilla.png',
+    preview: asset('/images/pando-zapatilla.png'),
+    file: asset('/images/pando-zapatilla.png'),
     format: 'PNG',
     resolution: '204 × 282 px',
   },

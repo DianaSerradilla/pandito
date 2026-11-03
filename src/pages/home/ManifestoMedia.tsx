@@ -1,3 +1,4 @@
+import { asset } from '../../lib/asset'
 import { useState } from 'react'
 import { SafeImage } from '../../components/ui/SafeImage'
 import { useCursorMotion } from '../../hooks/useCursorMotion'
@@ -114,7 +115,7 @@ export function ManifestoMedia({ photos }: { photos: [PhotoProps, PhotoProps] })
         onPointerLeave={leave}
       >
         <div className={innerClass} style={inner('s')}>
-          <img src="/brand/logotipo-naranja.svg" alt="" className="die-cut h-auto w-full" />
+          <img src={asset('/brand/logotipo-naranja.svg')} alt="" className="die-cut h-auto w-full" />
         </div>
       </div>
     </div>
