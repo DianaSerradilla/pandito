@@ -6,6 +6,7 @@ import { StatusMessage } from '../../components/ui/StatusMessage'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { FeaturedCard } from './FeaturedCard'
 import { FeaturedStack } from './FeaturedStack'
+import { featuredItems as sampleFeatured } from './featuredItems'
 import { ScrollSticker } from './ScrollSticker'
 import { isConnected, useFeaturedItems } from '../../data/publicCatalog'
 
@@ -39,11 +40,10 @@ function AllFeaturedButton() {
 
 export function FeaturedSection() {
   const reduce = usePrefersReducedMotion()
-  const featuredItems = useFeaturedItems()
-
-  // Connected, no featured pieces (still loading, none chosen, or the read failed) means no section:
-  // an empty "most requested" block would promise something that is not there.
-  if (isConnected && featuredItems.length === 0) return null
+  const chosenItems = useFeaturedItems()
+  // Connected, with no featured pieces chosen yet (or still loading), the wall shows the sample
+  // pieces so the section stays on the Home until the team picks the real ones. PROVISIONAL.
+  const featuredItems = chosenItems.length > 0 || !isConnected ? chosenItems : sampleFeatured
 
   return (
     <div className="surface-dark relative left-1/2 w-screen -translate-x-1/2 bg-tinta text-crema">

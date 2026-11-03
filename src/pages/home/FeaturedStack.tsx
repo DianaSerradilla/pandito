@@ -13,8 +13,13 @@ const SCROLL_PER_STICKER = 0.8 // screens of scroll for each sticker
 const HOLD = 0.12 // last share of the scroll, with everything already stuck
 const APPROACH = 0.74 // share of each sticker's turn spent flying in; the rest is the press
 
-// Tilt of the surface in the photo (degrees). The laptop is shot almost straight on, so just a hint.
-const TILT = { x: 1.5, y: -2, depth: 1200 }
+// The metal of the notebook in the photo is seen at an angle, so a sticker is laid on that plane
+// instead of facing the viewer: its own x axis follows the rows of keys (rising to the right) and its
+// own y axis follows the depth of the notebook (falling to the right, shorter because it is seen
+// obliquely). The two numbers of each axis are where a step of 1 along it lands on screen. Measured
+// on public/images/featured-notebook.webp; with another photo these four numbers must be measured
+// again.
+const PLANE = { xx: 0.883, xy: -0.469, yx: 0.62, yy: 0.5 }
 
 const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n))
 
@@ -54,10 +59,10 @@ function useWallScroll(ref: React.RefObject<HTMLElement | null>, featuredItems: 
         const rotation = item.rotate + lift * item.from.spin
         const stuck = p >= 1
 
-        // The tilt comes first (outermost): the sticker lies on the tilted plane of the window, so
-        // its own rotation and scale happen inside that plane.
+        // The plane comes first (outermost): the sticker lies on the metal of the notebook, so its
+        // own rotation and scale happen inside that plane.
         el.style.transform =
-          `translate(-50%, -50%) perspective(${TILT.depth}px) rotateX(${TILT.x}deg) rotateY(${TILT.y}deg) ` +
+          `translate(-50%, -50%) matrix(${PLANE.xx}, ${PLANE.xy}, ${PLANE.yx}, ${PLANE.yy}, 0, 0) ` +
           `translate(${(lift * item.from.x).toFixed(1)}px, ${(lift * item.from.y).toFixed(1)}px) ` +
           `rotate(${rotation.toFixed(2)}deg) scale(${scale.toFixed(4)})`
         el.style.opacity = p <= 0 ? '0' : clamp(a * 5).toFixed(3)
@@ -136,14 +141,15 @@ export function FeaturedStack({ intro, items: featuredItems }: { intro: ReactNod
     >
       <div className="sticky top-0 h-svh overflow-hidden">
         {/* The wall is a photo (team request): the corner of a laptop, melting into the ink background
-            on its left edge (mobile: on its top edge) with a gradient. The stickers are placed in %
-            of this box. Desktop: the box is two thirds of the screen wide and as tall as it, and the
-            photo fills it from the top (object-top), so the keys, the speaker grille and the palm
-            rest all show and it reads as a laptop. Mobile: a 4:5 box at the bottom. Keep the photo
-            free of other stickers. */}
-        <div className="absolute bottom-0 right-0 aspect-[4/5] h-[70svh] md:bottom-auto md:top-0 md:aspect-auto md:h-svh md:w-[67vw]">
+            on its left edge (mobile: on its top edge) with a gradient, and into it at the bottom,
+            where the photo is black. The photo is square and the stickers are placed in % of this
+            box. Desktop: the box is a square as tall as the screen (never wider than two thirds of
+            it), so the stickers sit on the same spot of the photo at any screen shape. Mobile: a 4:5
+            box at the bottom, which trims a tenth of the photo on each side. Keep the photo free of
+            other stickers. */}
+        <div className="absolute bottom-0 right-0 aspect-[4/5] h-[70svh] md:bottom-auto md:top-0 md:aspect-square md:h-[min(100svh,67vw)] md:w-auto">
           <img
-            src={asset('/images/featured-laptop.jpg')}
+            src={asset('/images/featured-notebook.webp')}
             alt=""
             aria-hidden="true"
             draggable={false}
@@ -152,12 +158,11 @@ export function FeaturedStack({ intro, items: featuredItems }: { intro: ReactNod
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-b from-tinta via-tinta/40 to-transparent to-45% md:bg-gradient-to-r md:from-tinta md:from-4% md:via-tinta/55 md:via-14% md:to-transparent md:to-40%"
+            className="absolute inset-0 bg-gradient-to-b from-tinta via-tinta/40 to-transparent to-45% md:bg-gradient-to-r md:from-tinta md:from-12% md:via-tinta/55 md:via-22% md:to-transparent md:to-45%"
           />
-          {/* Hides the thin bright line of the trackpad edge that the photo has near its left side. */}
           <div
             aria-hidden="true"
-            className="absolute -inset-y-px -left-1 w-[calc(24%+0.25rem)] bg-gradient-to-r from-tinta from-60% to-transparent"
+            className="absolute inset-x-0 -bottom-px h-[14%] bg-gradient-to-t from-tinta to-transparent"
           />
           <ul className="absolute inset-0">
             {featuredItems.map((item) => (

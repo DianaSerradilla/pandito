@@ -20,7 +20,7 @@ export type FeaturedItem = {
   x: number
   y: number
   width: number
-  /** Where it lands on desktop (the photo box is wide, two thirds of the screen). */
+  /** Where it lands on desktop (the photo box is a square there). */
   desktop: StickerSpot
   /** Final tilt in degrees. */
   rotate: number
@@ -28,69 +28,74 @@ export type FeaturedItem = {
   from: { x: number; y: number; spin: number }
 }
 
-// PLACEHOLDER stickers made from brand pieces (public/stickers and public/brand). The team replaces
-// `image` with the real designs: PNG or SVG with a transparent background. If the file already has
-// its white die-cut border baked in, leave `cut` off; otherwise set `cut: true`.
-// The order is the order in which they stick while scrolling: the last one lands on top.
-// Positions are set for the laptop photo (public/images/featured-laptop.jpg): they land on the
-// palm rest. With another photo, move them with x, y and width (mobile) and `desktop` (desktop).
-// Keep them inside the laptop: up to about 87% across and, on desktop, between 25% and 90% down.
+// The team's own designs (public/images/destacados), placed on the notebook photo
+// (public/images/featured-notebook.webp, square): they land on the flat metal of the palm rest and
+// the trackpad. Four carry their own white die-cut border, so `cut` stays off for them; the cats
+// are a plain rectangle, so `cut` adds the cream border with CSS. The order is the order in which
+// they stick while scrolling: the last one lands on top.
+// Desktop: the box is the whole photo, so x, y and width are % of the photo. Mobile: the box is 4:5
+// and trims a tenth of the photo on each side, so x is (photo x - 10) / 0.8 and width is the desktop
+// width / 0.8; the top of the box fades into the dark background, so the stickers sit a bit lower.
+// The spots were computed so no two stickers touch (at least ~1.4% of the photo apart), all stay
+// inside the metal and visible on mobile. `rotate` is the tilt inside the plane of the notebook (see
+// PLANE in FeaturedStack): the stickers also follow the angle of the notebook. If you change the
+// size of a sticker, check again that it does not touch its neighbors.
+// The names are PROVISIONAL: they only show on hover until the real pieces come from the catalog.
 export const featuredItems: FeaturedItem[] = [
   {
-    slug: 'cat-01',
-    name: 'Sticker isotipo',
-    image: asset('/stickers/isotipo-disc.svg'),
-    x: 76,
-    y: 22,
-    width: 23,
-    desktop: { x: 74, y: 38, width: 21 },
-    rotate: -8,
+    slug: 'destacado-caramelo',
+    name: 'Caramelo calavera',
+    image: asset('/images/destacados/r571.png'),
+    x: 59.5,
+    y: 70.8,
+    width: 26.6,
+    desktop: { x: 57.6, y: 70.8, width: 21.3 },
+    rotate: -6,
+    from: { x: -90, y: -60, spin: -26 },
+  },
+  {
+    slug: 'destacado-rostro',
+    name: 'Rostro con velo',
+    image: asset('/images/destacados/r551.png'),
+    x: 35.7,
+    y: 58.5,
+    width: 16.8,
+    desktop: { x: 38.5, y: 58.5, width: 13.4 },
+    rotate: 8,
     from: { x: 90, y: -70, spin: 28 },
   },
   {
-    slug: 'cat-02',
-    name: 'Sticker Pando',
-    image: asset('/brand/pando.svg'),
+    slug: 'destacado-gatos',
+    name: 'Gatos',
+    image: asset('/images/destacados/r261.png'),
     cut: true,
-    x: 52,
-    y: 47,
-    width: 18,
-    desktop: { x: 52, y: 67, width: 15 },
-    rotate: 4,
-    from: { x: -100, y: -40, spin: -24 },
-  },
-  {
-    slug: 'cat-03',
-    name: 'Sticker logotipo',
-    image: asset('/stickers/logotipo-label.svg'),
-    x: 66,
-    y: 62,
-    width: 40,
-    desktop: { x: 72, y: 76, width: 33 },
-    rotate: -8,
-    from: { x: 100, y: 70, spin: 20 },
-  },
-  {
-    slug: 'cat-04',
-    name: 'Sticker ojo',
-    image: asset('/stickers/star-eye.svg'),
-    x: 54,
-    y: 24,
+    x: 49,
+    y: 45.7,
     width: 21,
-    desktop: { x: 52, y: 36, width: 19 },
-    rotate: 12,
-    from: { x: -30, y: -100, spin: -30 },
+    desktop: { x: 49.2, y: 45.7, width: 16.8 },
+    rotate: 5,
+    from: { x: -100, y: 70, spin: -20 },
   },
   {
-    slug: 'cat-05',
-    name: 'Sticker mano',
-    image: asset('/brand/pando-mano-senalar.svg'),
-    cut: true,
-    x: 80,
-    y: 43,
-    width: 11,
-    desktop: { x: 83, y: 52, width: 9.5 },
-    rotate: 14,
+    slug: 'destacado-mano',
+    name: 'Mano esqueleto',
+    image: asset('/images/destacados/r71.png'),
+    x: 78.6,
+    y: 44.2,
+    width: 12.6,
+    desktop: { x: 72.9, y: 44.2, width: 10.1 },
+    rotate: -10,
     from: { x: 60, y: 90, spin: 26 },
+  },
+  {
+    slug: 'destacado-libertad',
+    name: 'Libertad calavera',
+    image: asset('/images/destacados/r501.png'),
+    x: 75.6,
+    y: 57.3,
+    width: 19.6,
+    desktop: { x: 70.5, y: 57.3, width: 15.7 },
+    rotate: -7,
+    from: { x: 100, y: 70, spin: 20 },
   },
 ]

@@ -1,12 +1,13 @@
 import { Link } from 'react-router'
 import { SafeImage } from '../../components/ui/SafeImage'
-import type { FeaturedItem } from '../../data/publicCatalog'
+import { getCatalog, type FeaturedItem } from '../../data/publicCatalog'
+import { paths } from '../../paths'
 
 // One featured sticker: just the die-cut shape, no frame or rectangle behind it.
 export function FeaturedCard({ item }: { item: FeaturedItem }) {
   return (
     <Link
-      to={`/catalogo/${item.slug}`}
+      to={getCatalog().items.some((entry) => entry.slug === item.slug) ? `/catalogo/${item.slug}` : paths.catalog}
       aria-label={`Ver ${item.name}`}
       className="block w-full focus-visible:outline focus-visible:outline-4 focus-visible:outline-amarillo focus-visible:outline-offset-4"
     >
